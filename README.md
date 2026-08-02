@@ -180,14 +180,32 @@ Estados: `pendiente → pagado → preparando → enviado → entregado` (+ `can
 
 ## Despliegue
 
+Se publica solo en **GitHub Pages**: cada push a `main` o a la rama de trabajo
+dispara el workflow `.github/workflows/deploy.yml`, que compila y publica. No
+hace falta ejecutar nada en local.
+
+**Una vez, para activarlo:** en el repositorio, *Settings → Pages → Build and
+deployment → Source*, elige **GitHub Actions**.
+
+El sitio queda en `https://quasarworksco.github.io/zibavenezuela/`.
+
+### Detalles que hacen falta bajo GitHub Pages
+
+- **Ruta base.** El sitio vive en una subcarpeta, así que `vite.config.js` fija
+  `base: '/zibavenezuela/'` y el router usa ese mismo prefijo. Si algún día se
+  pasa a un dominio propio, basta con `VITE_BASE=/` al compilar.
+- **Rutas internas.** GitHub Pages no reescribe URLs, de modo que entrar directo
+  a `/mujer` daría 404. El build copia `index.html` como `404.html`: Pages lo
+  sirve, la aplicación arranca y el router resuelve la ruta.
+- **`.nojekyll`.** Se genera en el build para que Pages no ignore ficheros que
+  empiezan por guión bajo.
+
+### Reglas de Firestore
+
+Esto no va por Pages, se publica aparte contra Firebase:
+
 ```bash
-npm run build
-firebase deploy --only hosting
+firebase deploy --only firestore:rules,firestore:indexes
 ```
 
-`firebase.json` ya trae el *rewrite* a `index.html` (necesario para las rutas del
-router) y el cacheado de `assets/`.
-
-Sirve igual cualquier hosting estático (Vercel, Netlify): carpeta `dist`, con
-todas las rutas redirigidas a `index.html` y las variables `VITE_*` definidas en
-el panel del proveedor.
+O pegando el contenido de `firestore.rules` en la consola de Firebase.
