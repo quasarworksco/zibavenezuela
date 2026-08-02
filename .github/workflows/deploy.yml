@@ -37,11 +37,10 @@ jobs:
       - name: Compilar
         run: npm run build
 
-      # `enablement` activa Pages en el repositorio si aún no lo está,
-      # de modo que no hace falta tocar nada en Settings
+      # Requiere que Pages esté activado en el repositorio:
+      # Settings > Pages > Build and deployment > Source: GitHub Actions.
+      # El token del workflow no tiene permiso para activarlo por su cuenta.
       - uses: actions/configure-pages@v5
-        with:
-          enablement: true
 
       - uses: actions/upload-pages-artifact@v3
         with:
