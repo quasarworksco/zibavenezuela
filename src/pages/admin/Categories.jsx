@@ -124,7 +124,7 @@ export default function Categories() {
             <tbody>
               {categories.map((cat) => (
                 <tr key={cat.id}>
-                  <td>
+                  <td data-label="">
                     <img
                       className="table__thumb"
                       src={cldUrl(imageSrc(cat.image), { w: 90 })}
@@ -132,18 +132,18 @@ export default function Categories() {
                       loading="lazy"
                     />
                   </td>
-                  <td>{cat.name}</td>
-                  <td>{SECTION_NAMES[cat.section] ?? cat.section}</td>
-                  <td className="u-muted">
+                  <td data-label="Categoría">{cat.name}</td>
+                  <td data-label="Sección">{SECTION_NAMES[cat.section] ?? cat.section}</td>
+                  <td data-label="URL" className="u-muted">
                     /{cat.section}/{cat.slug}
                   </td>
-                  <td>{cat.order}</td>
-                  <td>
+                  <td data-label="Orden">{cat.order}</td>
+                  <td data-label="Estado">
                     <span className={`badge ${cat.active ? 'badge--solid' : ''}`}>
                       {cat.active ? 'Visible' : 'Oculta'}
                     </span>
                   </td>
-                  <td>
+                  <td data-label="">
                     <div className="table__actions">
                       <button type="button" onClick={() => setEditing(cat)} aria-label="Editar">
                         <Icon name="edit" size={16} />

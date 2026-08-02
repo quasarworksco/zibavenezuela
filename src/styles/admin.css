@@ -128,14 +128,19 @@
 /* --- Tabla ---------------------------------------------------------------- */
 
 .table-wrap {
-  overflow-x: auto;
   border: 1px solid var(--ink-08);
   background: var(--paper-70);
 }
 
 .table {
-  min-width: 720px;
   font-size: var(--fs-sm);
+  table-layout: auto;
+}
+
+/* Las celdas largas parten en vez de ensanchar la tabla */
+.table td,
+.table th {
+  overflow-wrap: anywhere;
 }
 
 .table th {
@@ -172,7 +177,79 @@
   display: flex;
   gap: var(--sp-3);
   justify-content: flex-end;
-  white-space: nowrap;
+  flex-wrap: wrap;
+}
+
+/*
+ * En pantallas estrechas la tabla se convierte en fichas apiladas. Así no
+ * hace falta desplazarse en horizontal para leer un pedido o un producto:
+ * cada fila pasa a ser una tarjeta con su etiqueta a la izquierda.
+ */
+@media (max-width: 1023px) {
+  .table-wrap {
+    border: 0;
+    background: transparent;
+  }
+
+  .table,
+  .table tbody,
+  .table tr,
+  .table td {
+    display: block;
+    width: 100%;
+  }
+
+  .table thead {
+    display: none;
+  }
+
+  .table tr {
+    border: 1px solid var(--ink-08);
+    background: var(--paper-70);
+    padding: var(--sp-3) var(--sp-4);
+  }
+
+  .table tr + tr {
+    margin-top: var(--sp-3);
+  }
+
+  .table tbody tr:hover {
+    background: var(--paper-70);
+  }
+
+  .table td {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--sp-4);
+    padding: 5px 0;
+    border: 0;
+    text-align: right;
+  }
+
+  /* El nombre de la columna, que en escritorio vive en la cabecera */
+  .table td::before {
+    content: attr(data-label);
+    flex: 0 0 auto;
+    font-size: var(--fs-2xs);
+    text-transform: uppercase;
+    letter-spacing: var(--tracking-wide);
+    color: var(--ink-45);
+    text-align: left;
+  }
+
+  /* Celdas sin etiqueta (imagen, acciones) ocupan la fila entera */
+  .table td:not([data-label]) {
+    justify-content: flex-start;
+  }
+
+  .table td[data-label='']::before {
+    content: none;
+  }
+
+  .table__thumb {
+    width: 56px;
+  }
 }
 
 /* --- Formulario admin ----------------------------------------------------- */

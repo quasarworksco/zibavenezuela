@@ -100,14 +100,14 @@ export default function Orders() {
             <tbody>
               {filtered.map((order) => (
                 <tr key={order.id}>
-                  <td>{orderRef(order.id)}</td>
-                  <td>
+                  <td data-label="Pedido">{orderRef(order.id)}</td>
+                  <td data-label="Cliente">
                     {order.customer?.firstName} {order.customer?.lastName}
                   </td>
-                  <td className="u-muted">{order.customer?.phone}</td>
-                  <td>{formatDateTime(order.createdAt)}</td>
-                  <td>{formatPrice(order.total)}</td>
-                  <td>
+                  <td data-label="Contacto" className="u-muted">{order.customer?.phone}</td>
+                  <td data-label="Fecha">{formatDateTime(order.createdAt)}</td>
+                  <td data-label="Total">{formatPrice(order.total)}</td>
+                  <td data-label="Estado">
                     <select
                       className="toolbar__select"
                       value={order.status}
@@ -121,7 +121,7 @@ export default function Orders() {
                       ))}
                     </select>
                   </td>
-                  <td>
+                  <td data-label="">
                     <div className="table__actions">
                       <button
                         type="button"

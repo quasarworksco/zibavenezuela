@@ -148,7 +148,7 @@ export default function Products() {
                 const stock = totalStock(product)
                 return (
                   <tr key={product.id}>
-                    <td>
+                    <td data-label="">
                       <img
                         className="table__thumb"
                         src={cldUrl(imageSrc(product.images?.[0]), { w: 90 })}
@@ -156,7 +156,7 @@ export default function Products() {
                         loading="lazy"
                       />
                     </td>
-                    <td>
+                    <td data-label="Producto">
                       <Link to={`/admin/productos/${product.id}`}>{product.name}</Link>
                       {product.sku ? (
                         <span className="line__meta" style={{ display: 'block' }}>
@@ -164,16 +164,16 @@ export default function Products() {
                         </span>
                       ) : null}
                     </td>
-                    <td>{SECTION_NAMES[product.section] ?? '—'}</td>
-                    <td>{product.categoryName || '—'}</td>
-                    <td>{formatPrice(product.price)}</td>
-                    <td className={stock <= 0 ? 'u-muted' : ''}>{stock}</td>
-                    <td>
+                    <td data-label="Sección">{SECTION_NAMES[product.section] ?? '—'}</td>
+                    <td data-label="Categoría">{product.categoryName || '—'}</td>
+                    <td data-label="Precio">{formatPrice(product.price)}</td>
+                    <td data-label="Stock" className={stock <= 0 ? 'u-muted' : ''}>{stock}</td>
+                    <td data-label="Estado">
                       <span className={`badge ${product.active ? 'badge--solid' : ''}`}>
                         {product.active ? 'Publicado' : 'Oculto'}
                       </span>
                     </td>
-                    <td>
+                    <td data-label="">
                       <div className="table__actions">
                         <button
                           type="button"

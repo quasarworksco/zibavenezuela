@@ -262,22 +262,18 @@
 }
 
 /* Carrusel horizontal de categorías */
+/* Fluye en varias líneas en vez de desplazarse en horizontal */
 .rail {
   display: flex;
+  flex-wrap: wrap;
   gap: var(--sp-3);
-  overflow-x: auto;
-  scroll-snap-type: x mandatory;
   padding: 0 var(--gutter) var(--sp-4);
-  scrollbar-width: none;
-}
-
-.rail::-webkit-scrollbar {
-  display: none;
 }
 
 .rail__item {
-  flex: 0 0 clamp(150px, 40vw, 240px);
-  scroll-snap-align: start;
+  flex: 1 1 clamp(140px, 40vw, 240px);
+  max-width: 260px;
+  min-width: 0;
 }
 
 .rail__media {
@@ -485,20 +481,15 @@
   }
 }
 
+/* Las fotos se apilan a lo alto: nada que deslizar en horizontal */
 .pdp__slider {
   display: flex;
-  overflow-x: auto;
-  scroll-snap-type: x mandatory;
-  scrollbar-width: none;
-}
-
-.pdp__slider::-webkit-scrollbar {
-  display: none;
+  flex-direction: column;
+  gap: 2px;
 }
 
 .pdp__slide {
-  flex: 0 0 100%;
-  scroll-snap-align: center;
+  width: 100%;
   aspect-ratio: 2 / 3;
   background: var(--bone);
 }
