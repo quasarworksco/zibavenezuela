@@ -1,13 +1,21 @@
-import { copyFileSync, writeFileSync } from 'node:fs'
+import { copyFileSync, existsSync, writeFileSync } from 'node:fs'
 import { fileURLToPath } from 'node:url'
 
 import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
 
-// GitHub Pages publica el sitio dentro de una subcarpeta con el nombre del
-// repositorio. Se puede sobrescribir con VITE_BASE (por ejemplo "/" si algún
-// día se despliega en un dominio propio).
-const BASE = process.env.VITE_BASE ?? '/zibavenezuela/'
+/*
+ * Dónde vive el sitio:
+ *
+ *  - Con dominio propio sirve desde la raíz. Basta con crear `public/CNAME`
+ *    con el dominio dentro y esto lo detecta solo.
+ *  - Sin dominio, GitHub Pages lo publica en una subcarpeta con el nombre del
+ *    repositorio: /zibavenezuela/.
+ *
+ * VITE_BASE tiene prioridad sobre ambos por si hace falta forzarlo.
+ */
+const hasCustomDomain = existsSync(fileURLToPath(new URL('./public/CNAME', import.meta.url)))
+const BASE = process.env.VITE_BASE ?? (hasCustomDomain ? '/' : '/zibavenezuela/')
 
 /**
  * GitHub Pages no sabe reescribir las rutas de una aplicación de una sola
