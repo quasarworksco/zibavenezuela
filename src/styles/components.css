@@ -113,8 +113,27 @@
   display: block;
 }
 
-.field + .field {
+/*
+ * Separación entre bloques de formulario. Hay que enumerar las
+ * combinaciones porque una fila de dos columnas (.field-row) no es un
+ * .field: con sólo `.field + .field` todo lo que sigue a una fila doble
+ * quedaba pegado al elemento anterior.
+ */
+.field + .field,
+.field + .field-row,
+.field-row + .field,
+.field-row + .field-row,
+.field__hint + .field,
+.field__hint + .field-row,
+.field + .checkbox,
+.field-row + .checkbox {
   margin-top: var(--sp-4);
+}
+
+/* Un aviso suelto entre bloques necesita aire por arriba, no sólo por abajo */
+.field + .field__hint,
+.field-row + .field__hint {
+  margin-top: var(--sp-3);
 }
 
 .field__label {

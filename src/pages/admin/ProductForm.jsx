@@ -458,7 +458,7 @@ export default function ProductForm() {
               </label>
             </div>
 
-            <p className="field__hint" style={{ marginTop: '-0.5rem' }}>
+            <p className="field__hint">
               Si lo dejas vacío, el producto se vende sólo al detal. Con precio al mayor, la
               tienda lo aplica sola cuando el cliente llega a esa cantidad.
             </p>
