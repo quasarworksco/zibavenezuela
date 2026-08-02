@@ -261,7 +261,7 @@ export default function Product() {
             <Accordion title="Envíos y devoluciones">
               <p>
                 Envíos a toda Venezuela por Zoom y MRW en 2 a 5 días hábiles. Delivery en Caracas
-                en 24-48 horas. Gratis a partir de $80.
+                en 24-48 horas. El retiro en tienda no tiene costo.
               </p>
               <p>Dispones de 30 días para cambiar tu prenda sin usar y con su etiqueta.</p>
             </Accordion>

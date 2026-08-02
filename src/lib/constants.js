@@ -88,9 +88,6 @@ export const SHIPPING_METHODS = [
   },
 ]
 
-/** Compra mínima para envío gratuito, en dólares. */
-export const FREE_SHIPPING_THRESHOLD = 80
-
 /** Estados de Venezuela para la dirección de envío. */
 export const ESTADOS_VE = [
   'Amazonas',
@@ -126,6 +123,31 @@ export const SORT_OPTIONS = [
   { id: 'precio-desc', label: 'Precio: mayor a menor' },
   { id: 'nombre', label: 'Nombre A-Z' },
 ]
+
+/**
+ * Texto de la portada. Cambiarlo aquí lo cambia en las dos versiones del hero
+ * (con fotografía y sin ella), sin tocar los componentes.
+ * El título se parte en dos líneas.
+ */
+export const HERO = {
+  eyebrow: 'ZIBA Venezuela',
+  title: ['Moda', 'para todos'],
+  text: 'Ropa de tendencia para mujer, hombre y niños. Al detal y al mayor, con envíos a todo el país.',
+}
+
+/** Franja negra de la portada. */
+export const BAND = {
+  eyebrow: 'Mayoristas',
+  title: 'Al mayor y al detal',
+  text: 'Llévate una pieza para ti o surte tu negocio. Mientras más cantidad, mejor el precio.',
+  cta: 'Precios al mayor',
+}
+
+/** Frase de la barra superior. */
+export const ANNOUNCE = 'Envíos a toda Venezuela · Precios especiales al mayor'
+
+/** Crédito que aparece en el pie de página. */
+export const CREDIT = 'Hecho por DGP Global Group · Florida, USA'
 
 /** Datos de contacto de la tienda. */
 export const STORE = {

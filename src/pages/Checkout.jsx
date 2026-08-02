@@ -4,12 +4,7 @@ import { Link, Navigate, useNavigate } from 'react-router-dom'
 import Icon from '../components/ui/Icon.jsx'
 import { cldUrl } from '../lib/cloudinary.js'
 import { formatPrice } from '../lib/format.js'
-import {
-  ESTADOS_VE,
-  FREE_SHIPPING_THRESHOLD,
-  PAYMENT_METHODS,
-  SHIPPING_METHODS,
-} from '../lib/constants.js'
+import { ESTADOS_VE, PAYMENT_METHODS, SHIPPING_METHODS } from '../lib/constants.js'
 import { createOrder } from '../services/orders.js'
 import { useCart } from '../context/CartContext.jsx'
 import { useUI } from '../context/UIContext.jsx'
@@ -43,12 +38,7 @@ export default function Checkout() {
   const shippingMethod = SHIPPING_METHODS.find((m) => m.id === shippingId)
   const paymentMethod = PAYMENT_METHODS.find((m) => m.id === paymentId)
 
-  // El envío gratuito se aplica por importe, salvo el retiro que ya es gratis
-  const shippingCost = useMemo(() => {
-    if (!shippingMethod) return 0
-    if (subtotal >= FREE_SHIPPING_THRESHOLD) return 0
-    return shippingMethod.price
-  }, [shippingMethod, subtotal])
+  const shippingCost = useMemo(() => shippingMethod?.price ?? 0, [shippingMethod])
 
   const total = subtotal + shippingCost
 
@@ -216,9 +206,7 @@ export default function Checkout() {
                   <span className="pay__desc">{m.description}</span>
                 </span>
                 <span className="pay__name">
-                  {subtotal >= FREE_SHIPPING_THRESHOLD || m.price === 0
-                    ? 'Gratis'
-                    : formatPrice(m.price)}
+                  {m.price === 0 ? 'Sin costo' : formatPrice(m.price)}
                 </span>
               </label>
             ))}
@@ -349,7 +337,7 @@ export default function Checkout() {
             </div>
             <div className="totals__row">
               <span>Envío</span>
-              <span>{shippingCost === 0 ? 'Gratis' : formatPrice(shippingCost)}</span>
+              <span>{shippingCost === 0 ? 'Sin costo' : formatPrice(shippingCost)}</span>
             </div>
             <div className="totals__row totals__row--total">
               <span>Total</span>

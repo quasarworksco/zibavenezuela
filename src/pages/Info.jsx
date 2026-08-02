@@ -27,8 +27,11 @@ const PAGES = {
         <h2>Retiro en tienda</h2>
         <p>Sin costo. Te avisamos por WhatsApp cuando tu pedido esté listo.</p>
 
-        <h2>Envío gratuito</h2>
-        <p>Todas las compras superiores a $80 viajan sin costo de envío.</p>
+        <h2>Seguimiento</h2>
+        <p>
+          Te escribimos por WhatsApp en cada paso: cuando verificamos el pago, cuando despachamos
+          y cuando el pedido llega a destino.
+        </p>
       </>
     ),
   },
@@ -191,20 +194,26 @@ const PAGES = {
     body: (
       <>
         <p>
-          ZIBA nace en Venezuela con una idea sencilla: ropa bien hecha, de línea limpia y precio
-          justo, sin ruido.
+          ZIBA es una tienda venezolana de ropa para mujer, hombre y niños. Buscamos lo que se
+          está usando, lo traemos y lo ponemos a buen precio.
         </p>
 
-        <h2>Nuestra forma de trabajar</h2>
+        <h2>Al detal y al mayor</h2>
         <p>
-          Colecciones cortas, materiales cuidados y prendas pensadas para durar más de una
-          temporada. Blanco, negro y los tonos que acompañan: lo demás lo pone quien las lleva.
+          Puedes llevarte una sola pieza o surtir tu negocio. A partir de cierta cantidad
+          manejamos precios especiales: escríbenos por WhatsApp y te pasamos la lista.
+        </p>
+
+        <h2>Cómo trabajamos</h2>
+        <p>
+          No vamos por temporadas. Reponemos según lo que se vende, así que el catálogo cambia
+          seguido. Si algo te gustó y se agotó, avísanos y te escribimos cuando vuelva.
         </p>
 
         <h2>Dónde estamos</h2>
         <p>
-          Operamos en línea para toda Venezuela desde Caracas. Puedes escribirnos por WhatsApp o
-          Instagram cuando lo necesites.
+          Operamos en línea para toda Venezuela desde Caracas. Escríbenos por WhatsApp o Instagram
+          cuando lo necesites.
         </p>
       </>
     ),

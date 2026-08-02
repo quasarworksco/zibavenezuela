@@ -221,7 +221,7 @@ export default function Orders() {
               <div className="totals__row">
                 <span>Envío</span>
                 <span>
-                  {selected.shippingCost === 0 ? 'Gratis' : formatPrice(selected.shippingCost)}
+                  {selected.shippingCost === 0 ? 'Sin costo' : formatPrice(selected.shippingCost)}
                 </span>
               </div>
               <div className="totals__row totals__row--total">

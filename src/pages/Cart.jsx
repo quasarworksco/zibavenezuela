@@ -4,7 +4,6 @@ import Icon from '../components/ui/Icon.jsx'
 import { Empty } from '../components/ui/State.jsx'
 import { cldUrl } from '../lib/cloudinary.js'
 import { formatPrice } from '../lib/format.js'
-import { FREE_SHIPPING_THRESHOLD } from '../lib/constants.js'
 import { useCart } from '../context/CartContext.jsx'
 
 /** Página de la cesta, con el resumen fijo a un lado. */
@@ -24,8 +23,6 @@ export default function Cart() {
       </div>
     )
   }
-
-  const missing = Math.max(0, FREE_SHIPPING_THRESHOLD - subtotal)
 
   return (
     <div className="page">
@@ -103,7 +100,7 @@ export default function Cart() {
             </div>
             <div className="totals__row">
               <span>Envío</span>
-              <span>{missing > 0 ? 'Se calcula al pagar' : 'Gratis'}</span>
+              <span>Se calcula al tramitar</span>
             </div>
             <div className="totals__row totals__row--total">
               <span>Total</span>
@@ -111,11 +108,9 @@ export default function Cart() {
             </div>
           </div>
 
-          {missing > 0 ? (
-            <p className="field__hint" style={{ marginTop: '1rem' }}>
-              Añade {formatPrice(missing)} más y el envío te sale gratis.
-            </p>
-          ) : null}
+          <p className="field__hint" style={{ marginTop: '1rem' }}>
+            Eliges la forma de entrega en el siguiente paso. El retiro en tienda no tiene costo.
+          </p>
 
           <Link to="/comprar" className="btn btn--block" style={{ marginTop: '1.5rem' }}>
             Tramitar pedido

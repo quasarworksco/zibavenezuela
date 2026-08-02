@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom'
 
 import Icon from '../ui/Icon.jsx'
 import { LogoStacked } from '../ui/Logo.jsx'
-import { SECTIONS, STORE } from '../../lib/constants.js'
+import { CREDIT, SECTIONS, STORE } from '../../lib/constants.js'
 import { subscribe } from '../../services/newsletter.js'
 import { useUI } from '../../context/UIContext.jsx'
 
@@ -33,7 +33,7 @@ function Newsletter() {
       <div className="newsletter__inner">
         <p className="section__title">Newsletter</p>
         <p className="u-muted" style={{ marginTop: '0.75rem' }}>
-          Recibe antes que nadie las nuevas colecciones y las rebajas.
+          Entérate primero de lo que va llegando a la tienda.
         </p>
 
         {status === 'done' ? (
@@ -138,7 +138,7 @@ export default function Footer() {
         <div className="footer__bottom">
           <LogoStacked className="footer__logo" />
           <span>© {year} ZIBA Venezuela · Todos los derechos reservados</span>
-          <span>Hecho en Venezuela</span>
+          <span>{CREDIT}</span>
         </div>
       </footer>
     </>

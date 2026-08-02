@@ -4,7 +4,6 @@ import Drawer from '../ui/Drawer.jsx'
 import Icon from '../ui/Icon.jsx'
 import { cldUrl } from '../../lib/cloudinary.js'
 import { formatPrice } from '../../lib/format.js'
-import { FREE_SHIPPING_THRESHOLD } from '../../lib/constants.js'
 import { useCart } from '../../context/CartContext.jsx'
 import { useUI } from '../../context/UIContext.jsx'
 
@@ -12,8 +11,6 @@ import { useUI } from '../../context/UIContext.jsx'
 export default function CartDrawer() {
   const { panel, closePanel } = useUI()
   const { items, count, subtotal, setQuantity, removeItem } = useCart()
-
-  const missing = Math.max(0, FREE_SHIPPING_THRESHOLD - subtotal)
 
   const footer =
     items.length > 0 ? (
@@ -56,15 +53,9 @@ export default function CartDrawer() {
         </div>
       ) : (
         <>
-          {missing > 0 ? (
-            <p className="alert" style={{ marginBottom: '1rem' }}>
-              Te faltan <strong>{formatPrice(missing)}</strong> para el envío gratis.
-            </p>
-          ) : (
-            <p className="alert" style={{ marginBottom: '1rem' }}>
-              <Icon name="truck" size={14} /> Tu pedido tiene envío gratis.
-            </p>
-          )}
+          <p className="alert" style={{ marginBottom: '1rem' }}>
+            <Icon name="truck" size={14} /> El costo del envío se elige al tramitar el pedido.
+          </p>
 
           <ul>
             {items.map((line) => (

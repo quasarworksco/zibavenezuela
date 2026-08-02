@@ -5,7 +5,7 @@ import ProductGrid from '../components/product/ProductGrid.jsx'
 import ProductImage from '../components/product/ProductImage.jsx'
 import Icon from '../components/ui/Icon.jsx'
 import { cldUrl, imageSrc } from '../lib/cloudinary.js'
-import { SECTIONS } from '../lib/constants.js'
+import { BAND, HERO, SECTIONS, STORE } from '../lib/constants.js'
 import { listProducts } from '../services/products.js'
 import { useCategories } from '../hooks/useCategories.js'
 import { useUI } from '../context/UIContext.jsx'
@@ -64,11 +64,11 @@ export default function Home() {
           </div>
 
           <div className="hero__content">
-            <p className="hero__eyebrow">Nueva colección</p>
+            <p className="hero__eyebrow">{HERO.eyebrow}</p>
             <h1 className="hero__title">
-              Otoño
+              {HERO.title[0]}
               <br />
-              Invierno
+              {HERO.title[1]}
             </h1>
 
             <div className="hero__actions">
@@ -85,16 +85,14 @@ export default function Home() {
       ) : (
         /* Sin fotografía todavía: portada editorial en blanco */
         <section className="hero-plain">
-          <p className="hero__eyebrow">Nueva colección</p>
+          <p className="hero__eyebrow">{HERO.eyebrow}</p>
           <h1 className="hero-plain__title">
-            Otoño
+            {HERO.title[0]}
             <br />
-            Invierno
+            {HERO.title[1]}
           </h1>
           <span className="hero-plain__rule" />
-          <p className="hero-plain__text">
-            Prendas de línea limpia, en blanco y negro. Hechas para durar más de una temporada.
-          </p>
+          <p className="hero-plain__text">{HERO.text}</p>
 
           <div className="hero__actions">
             {SECTIONS.map((s) => (
@@ -146,17 +144,21 @@ export default function Home() {
         </section>
       ) : null}
 
-      {/* Franja negra: corta el blanco y marca el carácter de la marca */}
+      {/* Franja negra: corta el blanco y destaca la venta al mayor */}
       <section className="band">
-        <p className="band__eyebrow">ZIBA Venezuela</p>
-        <h2 className="band__title">Menos, pero mejor</h2>
-        <p className="band__text">
-          Colecciones cortas y materiales cuidados. Blanco, negro y los tonos que acompañan: lo
-          demás lo pone quien las lleva.
-        </p>
-        <Link to="/info/nosotros" className="btn btn--light">
-          Conocer ZIBA
-        </Link>
+        <p className="band__eyebrow">{BAND.eyebrow}</p>
+        <h2 className="band__title">{BAND.title}</h2>
+        <p className="band__text">{BAND.text}</p>
+        <a
+          className="btn btn--light"
+          href={`https://wa.me/${STORE.whatsapp}?text=${encodeURIComponent(
+            'Hola ZIBA, quiero información sobre los precios al mayor.',
+          )}`}
+          target="_blank"
+          rel="noreferrer noopener"
+        >
+          <Icon name="whatsapp" size={15} /> {BAND.cta}
+        </a>
       </section>
 
       <section className="section">
@@ -171,7 +173,7 @@ export default function Home() {
           products={featured.length ? featured : latest}
           loading={loading}
           emptyTitle="Muy pronto"
-          emptyText="Estamos preparando la primera colección. Vuelve en unos días."
+          emptyText="Estamos cargando las primeras prendas. Vuelve en unos días."
         />
       </section>
 
@@ -179,7 +181,12 @@ export default function Home() {
         <div className="perk">
           <Icon name="truck" size={20} style={{ margin: '0 auto 0.75rem' }} />
           <p className="perk__title">Envíos a toda Venezuela</p>
-          <p className="perk__text">Gratis en compras superiores a $80.</p>
+          <p className="perk__text">Zoom y MRW, o delivery en Caracas.</p>
+        </div>
+        <div className="perk">
+          <Icon name="tag" size={20} style={{ margin: '0 auto 0.75rem' }} />
+          <p className="perk__title">Al mayor y al detal</p>
+          <p className="perk__text">Precios especiales por cantidad.</p>
         </div>
         <div className="perk">
           <Icon name="refresh" size={20} style={{ margin: '0 auto 0.75rem' }} />
@@ -187,9 +194,9 @@ export default function Home() {
           <p className="perk__text">30 días para cambiar tu prenda.</p>
         </div>
         <div className="perk">
-          <Icon name="lock" size={20} style={{ margin: '0 auto 0.75rem' }} />
-          <p className="perk__title">Compra protegida</p>
-          <p className="perk__text">Pago móvil, transferencia y Zelle.</p>
+          <Icon name="whatsapp" size={20} style={{ margin: '0 auto 0.75rem' }} />
+          <p className="perk__title">Te asesoramos</p>
+          <p className="perk__text">Escríbenos si dudas con la talla.</p>
         </div>
       </section>
     </>

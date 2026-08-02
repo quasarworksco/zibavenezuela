@@ -5,6 +5,7 @@ import Footer from './Footer.jsx'
 import NavDrawer from './NavDrawer.jsx'
 import CartDrawer from './CartDrawer.jsx'
 import Toasts from '../ui/Toasts.jsx'
+import { ANNOUNCE } from '../../lib/constants.js'
 
 /**
  * Esqueleto de la tienda: barra de anuncios, cabecera, contenido y pie.
@@ -13,7 +14,7 @@ import Toasts from '../ui/Toasts.jsx'
 export default function Layout() {
   return (
     <div className="app">
-      <p className="announce">Envío gratis en compras superiores a $80 · Envíos a toda Venezuela</p>
+      <p className="announce">{ANNOUNCE}</p>
 
       <Header />
 
