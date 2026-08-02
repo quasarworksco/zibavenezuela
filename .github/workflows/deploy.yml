@@ -2,11 +2,13 @@ name: Publicar en GitHub Pages
 
 # Compila la tienda y la publica en cada push a la rama de trabajo.
 # También se puede lanzar a mano desde la pestaña Actions.
+# Sólo `main`: el entorno `github-pages` no acepta despliegues desde otras
+# ramas, así que lanzarlo desde una rama de trabajo sólo dejaba una ejecución
+# en rojo aunque la compilación fuera correcta.
 on:
   push:
     branches:
       - main
-      - claude/ziba-venezuela-ecommerce-c1db96
   workflow_dispatch:
 
 # Permisos que necesita la acción oficial de Pages
