@@ -1,0 +1,57 @@
+name: Publicar en GitHub Pages
+
+# Compila la tienda y la publica en cada push a la rama de trabajo.
+# También se puede lanzar a mano desde la pestaña Actions.
+on:
+  push:
+    branches:
+      - main
+      - claude/ziba-venezuela-ecommerce-c1db96
+  workflow_dispatch:
+
+# Permisos que necesita la acción oficial de Pages
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+# Si se empuja dos veces seguidas, que termine el último y se cancele el previo
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Instalar dependencias
+        run: npm ci
+
+      - name: Compilar
+        run: npm run build
+
+      # Requiere que Pages esté activado en el repositorio:
+      # Settings > Pages > Build and deployment > Source: GitHub Actions.
+      # El token del workflow no tiene permiso para activarlo por su cuenta.
+      - uses: actions/configure-pages@v5
+
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: dist
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v4

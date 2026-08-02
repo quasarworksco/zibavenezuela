@@ -17,7 +17,8 @@ import './styles/admin.css'
 
 createRoot(document.getElementById('root')).render(
   <StrictMode>
-    <BrowserRouter>
+    {/* `BASE_URL` es la subcarpeta donde se publica (GitHub Pages) */}
+    <BrowserRouter basename={import.meta.env.BASE_URL}>
       <UIProvider>
         <AuthProvider>
           <WishlistProvider>

@@ -180,14 +180,40 @@ Estados: `pendiente → pagado → preparando → enviado → entregado` (+ `can
 
 ## Despliegue
 
-```bash
-npm run build
-firebase deploy --only hosting
+Se publica solo en **GitHub Pages**: cada push a `main` o a la rama de trabajo
+dispara el workflow `.github/workflows/deploy.yml`, que compila y publica. No
+hace falta ejecutar nada en local.
+
+**Una vez, para activarlo:** en el repositorio, *Settings → Pages → Build and
+deployment → Source*, elige **GitHub Actions**.
+
+El sitio queda en **https://zibave.dgp-link.com**.
+
+El dominio se declara en `public/CNAME`, que el build copia a la raíz del
+sitio; GitHub Pages lo lee de ahí. En el DNS hace falta un registro:
+
+```
+CNAME   zibave   quasarworksco.github.io
 ```
 
-`firebase.json` ya trae el *rewrite* a `index.html` (necesario para las rutas del
-router) y el cacheado de `assets/`.
+### Detalles que hacen falta bajo GitHub Pages
 
-Sirve igual cualquier hosting estático (Vercel, Netlify): carpeta `dist`, con
-todas las rutas redirigidas a `index.html` y las variables `VITE_*` definidas en
-el panel del proveedor.
+- **Ruta base.** Con dominio propio el sitio sirve desde la raíz, así que
+  `vite.config.js` detecta `public/CNAME` y usa `base: '/'`. Si se quitara el
+  dominio, volvería solo a `/zibavenezuela/`, que es la subcarpeta que usa
+  GitHub Pages sin dominio.
+- **Rutas internas.** GitHub Pages no reescribe URLs, de modo que entrar directo
+  a `/mujer` daría 404. El build copia `index.html` como `404.html`: Pages lo
+  sirve, la aplicación arranca y el router resuelve la ruta.
+- **`.nojekyll`.** Se genera en el build para que Pages no ignore ficheros que
+  empiezan por guión bajo.
+
+### Reglas de Firestore
+
+Esto no va por Pages, se publica aparte contra Firebase:
+
+```bash
+firebase deploy --only firestore:rules,firestore:indexes
+```
+
+O pegando el contenido de `firestore.rules` en la consola de Firebase.
