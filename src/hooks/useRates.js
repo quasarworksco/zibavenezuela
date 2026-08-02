@@ -1,27 +1,39 @@
 import { useCallback, useEffect, useState } from 'react'
 
 import { DEFAULT_RATES, getRates } from '../services/settings.js'
+import { fetchBcvRate } from '../services/bcv.js'
 
 /**
  * Tasas de cambio de la tienda.
- * Se leen una vez y se comparten: las consultan la portada, cada tarjeta de
- * producto, la ficha y la cesta, así que no tiene sentido pedirlas de nuevo.
+ *
+ * La tasa ZIBA se guarda en Firestore. La del BCV se intenta traer de
+ * DolarAPI en cada carga y, si no responde, se usa la de respaldo guardada
+ * en el panel. Se pide una sola vez y se comparte: la consultan la portada,
+ * cada tarjeta, la ficha y la cesta.
  */
 let cache = null
 let inFlight = null
 
 function load() {
   if (cache) return Promise.resolve(cache)
-  inFlight ??= getRates()
-    .then((rates) => {
-      cache = rates
+
+  inFlight ??= Promise.all([getRates(), fetchBcvRate()])
+    .then(([stored, live]) => {
+      cache = {
+        ...stored,
+        bcv: live?.rate ?? stored.bcv,
+        bcvBackup: stored.bcv,
+        bcvSource: live ? 'dolarapi' : 'manual',
+        bcvUpdatedAt: live?.updatedAt ?? stored.updatedAt,
+      }
       inFlight = null
-      return rates
+      return cache
     })
     .catch((err) => {
       inFlight = null
       throw err
     })
+
   return inFlight
 }
 

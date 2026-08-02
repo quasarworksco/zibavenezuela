@@ -1,22 +1,34 @@
-import { useEffect, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 
+import Icon from '../../components/ui/Icon.jsx'
 import { Loader } from '../../components/ui/State.jsx'
 import { formatBs, formatDateTime, formatPrice } from '../../lib/format.js'
 import { realUsd, toBs } from '../../lib/pricing.js'
 import { getRates, saveRates } from '../../services/settings.js'
+import { fetchBcvRate } from '../../services/bcv.js'
 import { invalidateRates } from '../../hooks/useRates.js'
 import { useUI } from '../../context/UIContext.jsx'
-
-/** Días tras los cuales conviene revisar la tasa del BCV. */
-const STALE_DAYS = 2
 
 /** Tasas de cambio de la tienda. */
 export default function Rates() {
   const [form, setForm] = useState({ store: '', bcv: '' })
-  const [updatedAt, setUpdatedAt] = useState(null)
+  const [savedAt, setSavedAt] = useState(null)
+  const [live, setLive] = useState(null)
+  const [checking, setChecking] = useState(true)
   const [loading, setLoading] = useState(true)
   const [saving, setSaving] = useState(false)
   const { toast } = useUI()
+
+  const consultarApi = useCallback(async ({ avisar = false } = {}) => {
+    setChecking(true)
+    const result = await fetchBcvRate()
+    setLive(result)
+    setChecking(false)
+    if (avisar) {
+      toast(result ? `Tasa BCV: ${result.rate}` : 'DolarAPI no respondió')
+    }
+    return result
+  }, [toast])
 
   useEffect(() => {
     let active = true
@@ -27,40 +39,37 @@ export default function Rates() {
           store: rates.store ? String(rates.store) : '',
           bcv: rates.bcv ? String(rates.bcv) : '',
         })
-        setUpdatedAt(rates.updatedAt)
+        setSavedAt(rates.updatedAt)
       })
       .catch((err) => console.error('No se pudieron cargar las tasas:', err))
       .finally(() => active && setLoading(false))
+
+    consultarApi()
     return () => {
       active = false
     }
-  }, [])
+  }, [consultarApi])
 
   const store = Number(form.store) || 0
-  const bcv = Number(form.bcv) || 0
+  const backup = Number(form.bcv) || 0
+  // La que realmente se usa: la del API si respondió, si no la de respaldo
+  const bcv = live?.rate ?? backup
 
-  // Ejemplo en vivo para comprobar de un vistazo que las tasas están bien
   const ejemplo = 25
   const enBs = toBs(ejemplo, store)
   const real = realUsd(ejemplo, store, bcv)
 
-  const stale = (() => {
-    const d = updatedAt?.toDate?.() ?? (updatedAt ? new Date(updatedAt) : null)
-    if (!d) return false
-    return (Date.now() - d.getTime()) / 86400000 > STALE_DAYS
-  })()
-
   const onSubmit = async (e) => {
     e.preventDefault()
     if (store <= 0) {
-      toast('La tasa de la tienda debe ser mayor que cero')
+      toast('La tasa ZIBA debe ser mayor que cero')
       return
     }
     setSaving(true)
     try {
-      await saveRates({ store, bcv })
+      await saveRates({ store, bcv: backup })
       invalidateRates()
-      setUpdatedAt(new Date())
+      setSavedAt(new Date())
       toast('Tasas guardadas')
     } catch (err) {
       console.error('No se pudieron guardar las tasas:', err)
@@ -81,10 +90,10 @@ export default function Rates() {
       <div className="admin-form">
         <form onSubmit={onSubmit}>
           <section className="panel">
-            <p className="panel__title">Tasas</p>
+            <p className="panel__title">Tasa ZIBA</p>
 
             <label className="field">
-              <span className="field__label">Tasa ZIBA (Bs por dólar)</span>
+              <span className="field__label">Bolívares por dólar</span>
               <input
                 className="field__control"
                 type="number"
@@ -98,9 +107,56 @@ export default function Rates() {
                 Es la que convierte los precios a bolívares. Se aplica a todo el catálogo.
               </span>
             </label>
+          </section>
+
+          <section className="panel">
+            <p className="panel__title">Tasa BCV — automática</p>
+
+            {checking ? (
+              <p className="u-muted">Consultando DolarAPI…</p>
+            ) : live ? (
+              <>
+                <p className="stat__value" style={{ marginTop: 0 }}>
+                  {live.rate}
+                </p>
+                <p className="field__hint">
+                  Desde DolarAPI
+                  {live.updatedAt ? ` · actualizada ${formatDateTime(live.updatedAt)}` : ''}. Se
+                  consulta sola cada vez que alguien abre la tienda.
+                </p>
+              </>
+            ) : (
+              <p className="alert alert--error">
+                DolarAPI no respondió. La tienda está usando la tasa de respaldo de abajo.
+              </p>
+            )}
+
+            <div style={{ display: 'flex', gap: '0.5rem', marginTop: '1rem' }}>
+              <button
+                type="button"
+                className="btn btn--ghost btn--sm"
+                onClick={() => consultarApi({ avisar: true })}
+                disabled={checking}
+              >
+                <Icon name="refresh" size={14} /> Volver a consultar
+              </button>
+              {live ? (
+                <button
+                  type="button"
+                  className="btn btn--ghost btn--sm"
+                  onClick={() => setForm((f) => ({ ...f, bcv: String(live.rate) }))}
+                >
+                  Copiar al respaldo
+                </button>
+              ) : null}
+            </div>
+          </section>
+
+          <section className="panel">
+            <p className="panel__title">Tasa BCV — respaldo</p>
 
             <label className="field">
-              <span className="field__label">Tasa BCV (Bs por dólar)</span>
+              <span className="field__label">Bolívares por dólar</span>
               <input
                 className="field__control"
                 type="number"
@@ -111,15 +167,13 @@ export default function Rates() {
                 placeholder="750"
               />
               <span className="field__hint">
-                Sólo se usa para mostrar la equivalencia en dólares. Actualízala cuando cambie.
+                Sólo se usa si DolarAPI no responde. Conviene dejarla parecida a la real para que
+                los precios no se disparen si el servicio se cae.
               </span>
             </label>
 
-            {updatedAt ? (
-              <p className={stale ? 'alert alert--error' : 'field__hint'} style={{ marginTop: '1rem' }}>
-                Última actualización: {formatDateTime(updatedAt)}
-                {stale ? ' — conviene revisarla.' : ''}
-              </p>
+            {savedAt ? (
+              <p className="field__hint">Guardado por última vez: {formatDateTime(savedAt)}</p>
             ) : null}
 
             <button type="submit" className="btn" disabled={saving} style={{ marginTop: '1.5rem' }}>
@@ -152,8 +206,8 @@ export default function Rates() {
             )}
 
             <p className="field__hint" style={{ marginTop: '1.5rem' }}>
-              El precio en bolívares sale de multiplicar por la tasa ZIBA. El precio real es ese
-              monto dividido entre la tasa BCV, así que se mueve solo cuando el BCV cambia.
+              Se calcula con la tasa BCV en uso ({bcv > 0 ? bcv : '—'}
+              {live ? ', del API' : ', de respaldo'}).
             </p>
 
             {store > 0 && bcv > 0 && store < bcv ? (
