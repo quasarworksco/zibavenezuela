@@ -11,6 +11,10 @@ export function UIProvider({ children }) {
   const [toasts, setToasts] = useState([])
   const timers = useRef(new Map())
 
+  // Cómo se dibuja la cabecera sobre la portada: null = vidrio normal,
+  // 'dark' = transparente en blanco (sobre foto), 'light' = transparente en negro.
+  const [headerOverlay, setHeaderOverlay] = useState(null)
+
   const openPanel = useCallback((name) => setPanel(name), [])
   const closePanel = useCallback(() => setPanel(null), [])
   const togglePanel = useCallback((name) => {
@@ -65,8 +69,18 @@ export function UIProvider({ children }) {
   }, [])
 
   const value = useMemo(
-    () => ({ panel, openPanel, closePanel, togglePanel, toasts, toast, dismissToast }),
-    [panel, openPanel, closePanel, togglePanel, toasts, toast, dismissToast],
+    () => ({
+      panel,
+      openPanel,
+      closePanel,
+      togglePanel,
+      toasts,
+      toast,
+      dismissToast,
+      headerOverlay,
+      setHeaderOverlay,
+    }),
+    [panel, openPanel, closePanel, togglePanel, toasts, toast, dismissToast, headerOverlay],
   )
 
   return <UIContext.Provider value={value}>{children}</UIContext.Provider>

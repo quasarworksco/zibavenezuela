@@ -12,7 +12,7 @@ import { useUI } from '../../context/UIContext.jsx'
  * Cabecera fija. Sobre la portada es transparente y blanca; en cuanto se hace
  * scroll (o en cualquier otra página) adopta la superficie de vidrio.
  */
-export default function Header({ transparent = false }) {
+export default function Header() {
   const [scrolled, setScrolled] = useState(false)
   const [searchOpen, setSearchOpen] = useState(false)
   const [term, setTerm] = useState('')
@@ -23,7 +23,7 @@ export default function Header({ transparent = false }) {
   const { count } = useCart()
   const wishlist = useWishlist()
   const { user, isAdmin } = useAuth()
-  const { togglePanel } = useUI()
+  const { togglePanel, headerOverlay } = useUI()
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 24)
@@ -41,7 +41,9 @@ export default function Header({ transparent = false }) {
     if (searchOpen) inputRef.current?.focus()
   }, [searchOpen])
 
-  const over = transparent && !scrolled
+  // Sobre la portada la cabecera es transparente; el color del texto depende
+  // de si debajo hay una fotografía (blanco) o fondo claro (negro).
+  const over = headerOverlay && !scrolled
 
   const handleSearch = (e) => {
     e.preventDefault()
@@ -53,7 +55,11 @@ export default function Header({ transparent = false }) {
   }
 
   return (
-    <header className={`header ${over ? 'header--over' : 'header--glass'}`}>
+    <header
+      className={`header ${
+        over ? `header--over header--over-${headerOverlay}` : 'header--glass'
+      }`}
+    >
       <div className="header__left">
         <button
           type="button"

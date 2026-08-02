@@ -8,6 +8,7 @@ import { cldUrl, imageSrc } from '../lib/cloudinary.js'
 import { SECTIONS } from '../lib/constants.js'
 import { listProducts } from '../services/products.js'
 import { useCategories } from '../hooks/useCategories.js'
+import { useUI } from '../context/UIContext.jsx'
 
 /** Portada: gran imagen editorial, accesos por sección y una selección. */
 export default function Home() {
@@ -15,6 +16,7 @@ export default function Home() {
   const [latest, setLatest] = useState([])
   const [loading, setLoading] = useState(true)
   const { categories } = useCategories()
+  const { setHeaderOverlay } = useUI()
 
   useEffect(() => {
     let active = true
@@ -39,41 +41,70 @@ export default function Home() {
   const heroProduct = featured.find((p) => p.images?.length) ?? latest.find((p) => p.images?.length)
   const heroImage = heroProduct ? imageSrc(heroProduct.images[0]) : null
 
+  // Con foto, la cabecera va en blanco sobre la imagen; sin foto, en negro
+  // sobre el fondo claro. Se restablece al salir de la portada.
+  useEffect(() => {
+    setHeaderOverlay(heroImage ? 'dark' : 'light')
+    return () => setHeaderOverlay(null)
+  }, [heroImage, setHeaderOverlay])
+
   // Cuatro categorías con foto para el carrusel
   const railCategories = categories.filter((c) => c.image).slice(0, 8)
 
   return (
     <>
-      <section className="hero">
-        <div className="hero__media">
-          {heroImage ? (
+      {heroImage ? (
+        <section className="hero">
+          <div className="hero__media">
             <img
               src={cldUrl(heroImage, { w: 1800, h: 1200, gravity: 'auto' })}
               alt=""
               fetchPriority="high"
             />
-          ) : null}
-        </div>
+          </div>
 
-        <div className="hero__content">
+          <div className="hero__content">
+            <p className="hero__eyebrow">Nueva colección</p>
+            <h1 className="hero__title">
+              Otoño
+              <br />
+              Invierno
+            </h1>
+
+            <div className="hero__actions">
+              {SECTIONS.map((s) => (
+                <Link key={s.slug} to={`/${s.slug}`} className="btn btn--glass">
+                  {s.name}
+                </Link>
+              ))}
+            </div>
+          </div>
+
+          <span className="hero__scroll">Descubrir</span>
+        </section>
+      ) : (
+        /* Sin fotografía todavía: portada editorial en blanco */
+        <section className="hero-plain">
           <p className="hero__eyebrow">Nueva colección</p>
-          <h1 className="hero__title">
+          <h1 className="hero-plain__title">
             Otoño
             <br />
             Invierno
           </h1>
+          <span className="hero-plain__rule" />
+          <p className="hero-plain__text">
+            Prendas de línea limpia, en blanco y negro. Hechas para durar más de una temporada.
+          </p>
 
           <div className="hero__actions">
             {SECTIONS.map((s) => (
-              <Link key={s.slug} to={`/${s.slug}`} className="btn btn--glass">
+              <Link key={s.slug} to={`/${s.slug}`} className="btn btn--ghost">
                 {s.name}
               </Link>
             ))}
           </div>
-        </div>
-
-        <span className="hero__scroll">Descubrir</span>
-      </section>
+        </section>
+      )}
 
       {railCategories.length ? (
         <section className="section">
@@ -114,6 +145,19 @@ export default function Home() {
           ))}
         </section>
       ) : null}
+
+      {/* Franja negra: corta el blanco y marca el carácter de la marca */}
+      <section className="band">
+        <p className="band__eyebrow">ZIBA Venezuela</p>
+        <h2 className="band__title">Menos, pero mejor</h2>
+        <p className="band__text">
+          Colecciones cortas y materiales cuidados. Blanco, negro y los tonos que acompañan: lo
+          demás lo pone quien las lleva.
+        </p>
+        <Link to="/info/nosotros" className="btn btn--light">
+          Conocer ZIBA
+        </Link>
+      </section>
 
       <section className="section">
         <div className="section__head">
