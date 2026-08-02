@@ -1,0 +1,95 @@
+rules_version = '2';
+
+// ---------------------------------------------------------------------------
+// ZIBA VENEZUELA — Reglas de seguridad de Firestore
+//
+// Principio: el catálogo se lee público, se escribe sólo desde el panel de
+// administración. Los datos de cada cliente son privados.
+//
+// Publicar:  firebase deploy --only firestore:rules
+// ---------------------------------------------------------------------------
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // --- Ayudas -----------------------------------------------------------
+
+    function signedIn() {
+      return request.auth != null;
+    }
+
+    function isOwner(userId) {
+      return signedIn() && request.auth.uid == userId;
+    }
+
+    // El rol vive en el perfil del usuario y sólo se cambia desde la consola
+    function isAdmin() {
+      return signedIn()
+        && exists(/databases/$(database)/documents/users/$(request.auth.uid))
+        && get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'admin';
+    }
+
+    // --- Catálogo ---------------------------------------------------------
+
+    match /products/{productId} {
+      allow read: if true;
+      allow create, update, delete: if isAdmin();
+    }
+
+    match /categories/{categoryId} {
+      allow read: if true;
+      allow create, update, delete: if isAdmin();
+    }
+
+    // --- Usuarios ---------------------------------------------------------
+
+    match /users/{userId} {
+      allow read: if isOwner(userId) || isAdmin();
+
+      // Al crear el perfil el rol siempre arranca como 'cliente'
+      allow create: if isOwner(userId)
+        && request.resource.data.role == 'cliente';
+
+      // El cliente nunca puede promoverse a sí mismo
+      allow update: if (isOwner(userId)
+                        && request.resource.data.role == resource.data.role)
+                    || isAdmin();
+
+      allow delete: if isAdmin();
+    }
+
+    // --- Pedidos ----------------------------------------------------------
+
+    match /orders/{orderId} {
+      // El dueño ve su pedido; el administrador, todos.
+      // La confirmación tras comprar sin cuenta necesita leer un pedido sin
+      // userId: se protege con lo difícil que es adivinar el id del documento.
+      allow read: if isAdmin()
+                  || resource.data.userId == null
+                  || isOwner(resource.data.userId);
+
+      // Cualquiera puede registrar un pedido (compra como invitado), pero si
+      // va firmado tiene que serlo con su propio uid, y siempre nace pendiente.
+      allow create: if request.resource.data.status == 'pendiente'
+                    && request.resource.data.total is number
+                    && request.resource.data.total >= 0
+                    && (request.resource.data.userId == null
+                        || isOwner(request.resource.data.userId));
+
+      // Sólo el administrador mueve el estado de un pedido
+      allow update, delete: if isAdmin();
+    }
+
+    // --- Newsletter -------------------------------------------------------
+
+    match /newsletter/{email} {
+      allow create, update: if true;   // suscribirse es público
+      allow read, delete: if isAdmin();
+    }
+
+    // Todo lo que no esté declarado arriba queda cerrado
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}
