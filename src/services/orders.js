@@ -13,6 +13,7 @@ import {
 } from 'firebase/firestore'
 
 import { COL, db } from '../lib/firebase.js'
+import { lineIsWholesale, linePrice } from '../lib/pricing.js'
 
 const ordersRef = collection(db, COL.orders)
 
@@ -53,7 +54,9 @@ export async function createOrder({
     image: item.image ?? '',
     size: item.size ?? '',
     color: item.color ?? '',
-    price: Number(item.price ?? 0),
+    price: linePrice(item),
+    listPrice: Number(item.price ?? 0),
+    wholesale: lineIsWholesale(item),
     quantity: Number(item.quantity ?? 1),
   }))
 

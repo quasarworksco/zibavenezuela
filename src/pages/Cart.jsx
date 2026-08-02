@@ -4,6 +4,7 @@ import Icon from '../components/ui/Icon.jsx'
 import { Empty } from '../components/ui/State.jsx'
 import { cldUrl } from '../lib/cloudinary.js'
 import { formatPrice } from '../lib/format.js'
+import { lineIsWholesale, linePrice } from '../lib/pricing.js'
 import { useCart } from '../context/CartContext.jsx'
 
 /** Página de la cesta, con el resumen fijo a un lado. */
@@ -42,14 +43,23 @@ export default function Cart() {
                     <Link to={`/producto/${line.slug}`} className="line__name">
                       {line.name}
                     </Link>
-                    <span>{formatPrice(line.price * line.quantity)}</span>
+                    <span>{formatPrice(linePrice(line) * line.quantity)}</span>
                   </div>
 
                   <p className="line__meta">
                     {[line.size && `Talla ${line.size}`, line.color].filter(Boolean).join(' · ') ||
                       'Talla única'}
                   </p>
-                  <p className="line__meta">{formatPrice(line.price)} / unidad</p>
+                  <p className="line__meta">
+                    {formatPrice(linePrice(line))} / unidad
+                    {lineIsWholesale(line) ? ' · precio al mayor' : ''}
+                  </p>
+                  {!lineIsWholesale(line) && line.wholesalePrice ? (
+                    <p className="line__meta">
+                      Lleva {line.wholesaleFrom} o más y pagas{' '}
+                      {formatPrice(line.wholesalePrice)} cada una.
+                    </p>
+                  ) : null}
 
                   <div className="line__foot">
                     <div className="qty">

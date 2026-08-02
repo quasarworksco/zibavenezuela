@@ -9,6 +9,7 @@ import { cldUrl, imageSrc } from '../lib/cloudinary.js'
 import { formatPrice } from '../lib/format.js'
 import { SECTION_NAMES, STORE } from '../lib/constants.js'
 import { getProductBySlug, isSoldOut, listRelated } from '../services/products.js'
+import { hasWholesale, wholesaleFrom } from '../lib/pricing.js'
 import { useCart } from '../context/CartContext.jsx'
 import { useWishlist } from '../context/WishlistContext.jsx'
 import { useUI } from '../context/UIContext.jsx'
@@ -165,6 +166,13 @@ export default function Product() {
             {onSale ? <del>{formatPrice(product.compareAtPrice)}</del> : null}
             {soldOut ? <span className="badge">Agotado</span> : null}
           </p>
+
+          {hasWholesale(product) ? (
+            <p className="alert">
+              <strong>Al mayor: {formatPrice(product.wholesalePrice)}</strong> por unidad llevando{' '}
+              {wholesaleFrom(product)} o más. Se aplica solo en la cesta.
+            </p>
+          ) : null}
 
           {product.sku ? <p className="listing__count">Ref. {product.sku}</p> : null}
 

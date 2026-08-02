@@ -19,6 +19,8 @@ const EMPTY = {
   care: '',
   price: '',
   compareAtPrice: '',
+  wholesalePrice: '',
+  wholesaleMinQty: '6',
   section: SECTIONS[0].slug,
   categorySlug: '',
   images: [],
@@ -59,6 +61,8 @@ export default function ProductForm() {
           ...product,
           price: String(product.price ?? ''),
           compareAtPrice: product.compareAtPrice ? String(product.compareAtPrice) : '',
+          wholesalePrice: product.wholesalePrice ? String(product.wholesalePrice) : '',
+          wholesaleMinQty: String(product.wholesaleMinQty ?? 6),
           tags: (product.tags ?? []).join(', '),
         })
       })
@@ -124,6 +128,12 @@ export default function ProductForm() {
     if (form.compareAtPrice && Number(form.compareAtPrice) <= Number(form.price)) {
       next.compareAtPrice = 'El precio anterior debe ser mayor que el actual.'
     }
+    if (form.wholesalePrice && Number(form.wholesalePrice) >= Number(form.price)) {
+      next.wholesalePrice = 'El precio al mayor debe ser menor que el del detal.'
+    }
+    if (form.wholesalePrice && Number(form.wholesaleMinQty) < 2) {
+      next.wholesaleMinQty = 'La cantidad mínima debe ser 2 o más.'
+    }
     setErrors(next)
     return Object.keys(next).length === 0
   }
@@ -142,6 +152,8 @@ export default function ProductForm() {
       ...form,
       price: Number(form.price),
       compareAtPrice: form.compareAtPrice ? Number(form.compareAtPrice) : null,
+      wholesalePrice: form.wholesalePrice ? Number(form.wholesalePrice) : null,
+      wholesaleMinQty: form.wholesaleMinQty ? Number(form.wholesaleMinQty) : null,
       categoryName: category?.name ?? '',
       tags: form.tags
         .split(',')
@@ -411,6 +423,45 @@ export default function ProductForm() {
                 ) : null}
               </label>
             </div>
+
+            <div className="field-row">
+              <label className="field">
+                <span className="field__label">Precio al mayor ($)</span>
+                <input
+                  className="field__control"
+                  type="number"
+                  min="0"
+                  step="0.01"
+                  value={form.wholesalePrice}
+                  onChange={update('wholesalePrice')}
+                  placeholder="Opcional"
+                />
+                {errors.wholesalePrice ? (
+                  <span className="field__error">{errors.wholesalePrice}</span>
+                ) : null}
+              </label>
+
+              <label className="field">
+                <span className="field__label">Desde (unidades)</span>
+                <input
+                  className="field__control"
+                  type="number"
+                  min="2"
+                  step="1"
+                  value={form.wholesaleMinQty}
+                  onChange={update('wholesaleMinQty')}
+                  disabled={!form.wholesalePrice}
+                />
+                {errors.wholesaleMinQty ? (
+                  <span className="field__error">{errors.wholesaleMinQty}</span>
+                ) : null}
+              </label>
+            </div>
+
+            <p className="field__hint" style={{ marginTop: '-0.5rem' }}>
+              Si lo dejas vacío, el producto se vende sólo al detal. Con precio al mayor, la
+              tienda lo aplica sola cuando el cliente llega a esa cantidad.
+            </p>
 
             <label className="field">
               <span className="field__label">Etiquetas</span>

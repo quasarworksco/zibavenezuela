@@ -2,6 +2,7 @@ import { createContext, useCallback, useContext, useEffect, useMemo, useReducer 
 
 import { useUI } from './UIContext.jsx'
 import { imageSrc } from '../lib/cloudinary.js'
+import { hasWholesale, linePrice, wholesaleFrom } from '../lib/pricing.js'
 
 const CartContext = createContext(null)
 const STORAGE_KEY = 'ziba.cart.v1'
@@ -90,6 +91,9 @@ export function CartProvider({ children }) {
         slug: product.slug,
         image: imageSrc(product.images?.[0]),
         price: Number(product.price ?? 0),
+        // Se guardan en la línea para que el carrito calcule sin releer el producto
+        wholesalePrice: hasWholesale(product) ? Number(product.wholesalePrice) : null,
+        wholesaleFrom: hasWholesale(product) ? wholesaleFrom(product) : null,
         size,
         color,
         quantity: Math.max(1, quantity),
@@ -125,7 +129,7 @@ export function CartProvider({ children }) {
       items.reduce(
         (acc, l) => ({
           count: acc.count + l.quantity,
-          subtotal: acc.subtotal + l.price * l.quantity,
+          subtotal: acc.subtotal + linePrice(l) * l.quantity,
         }),
         { count: 0, subtotal: 0 },
       ),

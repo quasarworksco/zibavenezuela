@@ -5,6 +5,7 @@ import Icon from '../components/ui/Icon.jsx'
 import { cldUrl } from '../lib/cloudinary.js'
 import { formatPrice } from '../lib/format.js'
 import { ESTADOS_VE, PAYMENT_METHODS, SHIPPING_METHODS } from '../lib/constants.js'
+import { linePrice } from '../lib/pricing.js'
 import { createOrder } from '../services/orders.js'
 import { useCart } from '../context/CartContext.jsx'
 import { useUI } from '../context/UIContext.jsx'
@@ -324,7 +325,7 @@ export default function Checkout() {
                   </span>
                 </span>
                 <span style={{ fontSize: 'var(--fs-sm)' }}>
-                  {formatPrice(line.price * line.quantity)}
+                  {formatPrice(linePrice(line) * line.quantity)}
                 </span>
               </li>
             ))}

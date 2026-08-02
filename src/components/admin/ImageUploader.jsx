@@ -11,8 +11,25 @@ import { useUI } from '../../context/UIContext.jsx'
 export default function ImageUploader({ images = [], onChange, alt = '' }) {
   const [uploading, setUploading] = useState([])
   const [dragOver, setDragOver] = useState(false)
+  const [link, setLink] = useState('')
   const inputRef = useRef(null)
   const { toast } = useUI()
+
+  /**
+   * Añade una foto por enlace, sin pasar por Cloudinary. Útil para reutilizar
+   * imágenes que ya están publicadas en otro sitio.
+   */
+  const addByLink = () => {
+    const url = link.trim()
+    if (!url) return
+    if (!/^https?:\/\/\S+$/i.test(url)) {
+      toast('El enlace debe empezar por http:// o https://')
+      return
+    }
+    onChange([...images, { publicId: '', url, alt }])
+    setLink('')
+    toast('Imagen añadida')
+  }
 
   const handleFiles = async (fileList) => {
     const files = [...fileList].filter((f) => f.type.startsWith('image/'))
@@ -140,6 +157,35 @@ export default function ImageUploader({ images = [], onChange, alt = '' }) {
 
       <p className="field__hint">
         Arrastra las fotos o haz clic. La primera es la principal; usa las flechas para reordenar.
+      </p>
+
+      <div style={{ display: 'flex', gap: '0.5rem', marginTop: '0.75rem' }}>
+        <label className="u-sr" htmlFor="image-link">
+          Enlace de la imagen
+        </label>
+        <input
+          id="image-link"
+          className="field__control"
+          type="url"
+          value={link}
+          onChange={(e) => setLink(e.target.value)}
+          onKeyDown={(e) => {
+            if (e.key === 'Enter') {
+              e.preventDefault()
+              addByLink()
+            }
+          }}
+          placeholder="…o pega el enlace de una foto"
+          style={{ minHeight: 38, fontSize: 'var(--fs-sm)' }}
+        />
+        <button type="button" className="btn btn--sm" onClick={addByLink} disabled={!link.trim()}>
+          Añadir
+        </button>
+      </div>
+
+      <p className="field__hint">
+        Las fotos por enlace se muestran desde su servidor original: si allí se borran, aquí
+        dejan de verse. Subirlas queda más seguro.
       </p>
     </>
   )

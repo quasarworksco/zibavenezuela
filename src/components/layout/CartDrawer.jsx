@@ -4,6 +4,7 @@ import Drawer from '../ui/Drawer.jsx'
 import Icon from '../ui/Icon.jsx'
 import { cldUrl } from '../../lib/cloudinary.js'
 import { formatPrice } from '../../lib/format.js'
+import { lineIsWholesale, linePrice } from '../../lib/pricing.js'
 import { useCart } from '../../context/CartContext.jsx'
 import { useUI } from '../../context/UIContext.jsx'
 
@@ -69,13 +70,21 @@ export default function CartDrawer() {
                     <Link to={`/producto/${line.slug}`} className="line__name" onClick={closePanel}>
                       {line.name}
                     </Link>
-                    <span>{formatPrice(line.price * line.quantity)}</span>
+                    <span>{formatPrice(linePrice(line) * line.quantity)}</span>
                   </div>
 
                   <p className="line__meta">
                     {[line.size && `Talla ${line.size}`, line.color].filter(Boolean).join(' · ') ||
                       'Talla única'}
                   </p>
+
+                  {lineIsWholesale(line) ? (
+                    <p className="line__meta">Precio al mayor aplicado</p>
+                  ) : line.wholesalePrice ? (
+                    <p className="line__meta">
+                      Desde {line.wholesaleFrom} u. a {formatPrice(line.wholesalePrice)}
+                    </p>
+                  ) : null}
 
                   <div className="line__foot">
                     <div className="qty">
