@@ -4,13 +4,11 @@
  * Crea las categorías base y un catálogo de ejemplo para poder ver la tienda
  * funcionando antes de cargar el inventario real.
  *
- *   1. Crea en Firebase Authentication un usuario con correo y contraseña.
- *   2. En Firestore, en `users/<uid>`, pon el campo `role` a "admin".
- *   3. Copia ese correo y contraseña en `.env` (SEED_ADMIN_EMAIL / SEED_ADMIN_PASSWORD).
- *   4. Ejecuta:  npm run seed
+ *   1. Publica las reglas de Firestore (firebase deploy --only firestore:rules).
+ *   2. Ejecuta:  npm run seed
  *
- * El script escribe autenticado como ese administrador, de modo que respeta
- * las mismas reglas de seguridad que la aplicación.
+ * La tienda no usa Firebase Authentication, así que el script escribe igual
+ * que lo haría el panel: sin sesión.
  */
 
 import { readFileSync } from 'node:fs'
@@ -18,7 +16,6 @@ import { dirname, resolve } from 'node:path'
 import { fileURLToPath } from 'node:url'
 
 import { initializeApp } from 'firebase/app'
-import { getAuth, signInWithEmailAndPassword } from 'firebase/auth'
 import {
   collection,
   doc,
@@ -274,23 +271,7 @@ const PRODUCTS = [
 
 async function main() {
   const app = initializeApp(firebaseConfig)
-  const auth = getAuth(app)
   const db = getFirestore(app)
-
-  const email = env.SEED_ADMIN_EMAIL
-  const password = env.SEED_ADMIN_PASSWORD
-
-  if (!email || !password) {
-    console.error(
-      'Faltan SEED_ADMIN_EMAIL y SEED_ADMIN_PASSWORD en el archivo .env.\n' +
-        'Crea un usuario administrador en Firebase Authentication y ponle role="admin"\n' +
-        'en su documento de la colección `users`.',
-    )
-    process.exit(1)
-  }
-
-  console.log(`Entrando como ${email}…`)
-  await signInWithEmailAndPassword(auth, email, password)
 
   // --- Categorías -----------------------------------------------------------
 
@@ -373,7 +354,7 @@ async function main() {
 main().catch((err) => {
   console.error('\nLa semilla falló:', err.message ?? err)
   if (err.code === 'permission-denied') {
-    console.error('El usuario no tiene role="admin" en su documento de `users`.')
+    console.error('Publica antes las reglas: firebase deploy --only firestore:rules')
   }
   process.exit(1)
 })

@@ -20,7 +20,6 @@ function mapOrder(snap) {
   const data = snap.data() ?? {}
   return {
     id: snap.id,
-    userId: data.userId ?? null,
     items: Array.isArray(data.items) ? data.items : [],
     customer: data.customer ?? {},
     shipping: data.shipping ?? {},
@@ -40,7 +39,6 @@ function mapOrder(snap) {
  * para que el documento guardado sea coherente consigo mismo.
  */
 export async function createOrder({
-  userId = null,
   items,
   customer,
   shipping,
@@ -63,7 +61,6 @@ export async function createOrder({
   const cost = Number(shippingCost ?? 0)
 
   const ref = await addDoc(ordersRef, {
-    userId,
     items: lines,
     customer,
     shipping,
@@ -83,15 +80,6 @@ export async function createOrder({
 export async function getOrder(id) {
   const snap = await getDoc(doc(db, COL.orders, id))
   return snap.exists() ? mapOrder(snap) : null
-}
-
-/** Pedidos de un usuario, del más reciente al más antiguo. */
-export async function listOrdersByUser(userId, max = 50) {
-  if (!userId) return []
-  const snap = await getDocs(query(ordersRef, where('userId', '==', userId), fbLimit(max)))
-  return snap.docs
-    .map(mapOrder)
-    .sort((a, b) => (b.createdAt?.seconds ?? 0) - (a.createdAt?.seconds ?? 0))
 }
 
 /** Todos los pedidos, para el panel. */

@@ -11,7 +11,6 @@ import {
   SHIPPING_METHODS,
 } from '../lib/constants.js'
 import { createOrder } from '../services/orders.js'
-import { useAuth } from '../context/AuthContext.jsx'
 import { useCart } from '../context/CartContext.jsx'
 import { useUI } from '../context/UIContext.jsx'
 
@@ -31,17 +30,10 @@ const EMPTY_FORM = {
 /** Tramitación del pedido: datos, envío y forma de pago en una sola página. */
 export default function Checkout() {
   const { items, subtotal, clear } = useCart()
-  const { user, profile } = useAuth()
   const { toast } = useUI()
   const navigate = useNavigate()
 
-  const [form, setForm] = useState(() => ({
-    ...EMPTY_FORM,
-    email: user?.email ?? '',
-    firstName: (profile?.displayName ?? user?.displayName ?? '').split(' ')[0] ?? '',
-    lastName: (profile?.displayName ?? user?.displayName ?? '').split(' ').slice(1).join(' '),
-    phone: profile?.phone ?? '',
-  }))
+  const [form, setForm] = useState(EMPTY_FORM)
   const [shippingId, setShippingId] = useState(SHIPPING_METHODS[0].id)
   const [paymentId, setPaymentId] = useState(PAYMENT_METHODS[0].id)
   const [errors, setErrors] = useState({})
@@ -97,7 +89,6 @@ export default function Checkout() {
     setSending(true)
     try {
       const id = await createOrder({
-        userId: user?.uid ?? null,
         items,
         customer: {
           firstName: form.firstName.trim(),
@@ -381,15 +372,9 @@ export default function Checkout() {
             completar el pago. No guardamos información bancaria.
           </p>
 
-          {!user ? (
-            <p className="field__hint" style={{ marginTop: '0.75rem' }}>
-              ¿Ya tienes cuenta?{' '}
-              <Link to="/entrar" className="u-link">
-                Inicia sesión
-              </Link>{' '}
-              para guardar tus pedidos.
-            </p>
-          ) : null}
+          <p className="field__hint" style={{ marginTop: '0.75rem' }}>
+            Guarda el enlace de confirmación: es la forma de consultar tu pedido más adelante.
+          </p>
         </aside>
       </form>
     </div>

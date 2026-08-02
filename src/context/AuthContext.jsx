@@ -1,92 +1,48 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react'
-import {
-  createUserWithEmailAndPassword,
-  onAuthStateChanged,
-  sendPasswordResetEmail,
-  signInWithEmailAndPassword,
-  signOut,
-  updateProfile,
-} from 'firebase/auth'
 
-import { auth } from '../lib/firebase.js'
-import { ensureUserProfile, getUserProfile, updateUserProfile } from '../services/users.js'
+import { checkCredentials, closeSession, openSession, readSession } from '../lib/auth.js'
 
 const AuthContext = createContext(null)
 
+/**
+ * Sesión del administrador, resuelta en el navegador.
+ * La tienda no tiene cuentas de cliente: se compra como invitado.
+ */
 export function AuthProvider({ children }) {
-  const [user, setUser] = useState(null)
-  const [profile, setProfile] = useState(null)
+  const [isAdmin, setIsAdmin] = useState(false)
   const [loading, setLoading] = useState(true)
 
+  // Rehidrata la sesión guardada al arrancar
   useEffect(() => {
-    return onAuthStateChanged(auth, async (fbUser) => {
-      setUser(fbUser)
-      if (fbUser) {
-        try {
-          setProfile(await ensureUserProfile(fbUser))
-        } catch (err) {
-          // Sin perfil la tienda sigue funcionando: sólo se pierden los favoritos
-          console.error('No se pudo cargar el perfil:', err)
-          setProfile(null)
-        }
-      } else {
-        setProfile(null)
-      }
-      setLoading(false)
-    })
+    setIsAdmin(readSession())
+    setLoading(false)
   }, [])
 
-  const refreshProfile = useCallback(async () => {
-    if (!user) return null
-    const fresh = await getUserProfile(user.uid)
-    setProfile(fresh)
-    return fresh
-  }, [user])
-
-  const register = useCallback(async ({ email, password, displayName, phone }) => {
-    const cred = await createUserWithEmailAndPassword(auth, email, password)
-    if (displayName) await updateProfile(cred.user, { displayName })
-    const created = await ensureUserProfile(cred.user, { displayName, phone })
-    setProfile(created)
-    return cred.user
+  // Si se cierra sesión en otra pestaña, esta se entera
+  useEffect(() => {
+    const onStorage = (e) => {
+      if (e.key === 'ziba.admin.v1') setIsAdmin(readSession())
+    }
+    window.addEventListener('storage', onStorage)
+    return () => window.removeEventListener('storage', onStorage)
   }, [])
 
-  const login = useCallback(async ({ email, password }) => {
-    const cred = await signInWithEmailAndPassword(auth, email, password)
-    return cred.user
+  const login = useCallback(({ username, password }) => {
+    if (!checkCredentials(username, password)) {
+      const error = new Error('Usuario o contraseña incorrectos.')
+      error.code = 'auth/invalid-credential'
+      throw error
+    }
+    openSession()
+    setIsAdmin(true)
   }, [])
 
-  const logout = useCallback(() => signOut(auth), [])
+  const logout = useCallback(() => {
+    closeSession()
+    setIsAdmin(false)
+  }, [])
 
-  const resetPassword = useCallback((email) => sendPasswordResetEmail(auth, email), [])
-
-  const saveProfile = useCallback(
-    async (data) => {
-      if (!user) return
-      await updateUserProfile(user.uid, data)
-      if (data.displayName && data.displayName !== user.displayName) {
-        await updateProfile(user, { displayName: data.displayName })
-      }
-      await refreshProfile()
-    },
-    [user, refreshProfile],
-  )
-
-  const value = useMemo(
-    () => ({
-      user,
-      profile,
-      loading,
-      isAdmin: profile?.role === 'admin',
-      register,
-      login,
-      logout,
-      resetPassword,
-      saveProfile,
-      refreshProfile,
-    }),
-    [user, profile, loading, register, login, logout, resetPassword, saveProfile, refreshProfile],
-  )
+  const value = useMemo(() => ({ isAdmin, loading, login, logout }), [isAdmin, loading, login, logout])
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>
 }

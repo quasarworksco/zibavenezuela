@@ -1,5 +1,4 @@
 import { initializeApp } from 'firebase/app'
-import { getAuth } from 'firebase/auth'
 import { getFirestore } from 'firebase/firestore'
 
 // Los valores viven en `.env` (ver `.env.example`). Se dejan los del proyecto
@@ -14,8 +13,8 @@ const firebaseConfig = {
   appId: import.meta.env.VITE_FIREBASE_APP_ID ?? '1:1051007117204:web:37173534f0021f49da5181',
 }
 
+// Sólo se usa Firestore: la tienda no tiene Firebase Authentication.
 export const app = initializeApp(firebaseConfig)
-export const auth = getAuth(app)
 export const db = getFirestore(app)
 
 /** Nombres de las colecciones de Firestore, en un solo sitio. */
@@ -23,6 +22,5 @@ export const COL = {
   products: 'products',
   categories: 'categories',
   orders: 'orders',
-  users: 'users',
   newsletter: 'newsletter',
 }

@@ -87,8 +87,8 @@ export default function OrderConfirmation() {
         >
           <Icon name="whatsapp" size={15} /> Completar el pago
         </a>
-        <Link to="/cuenta/pedidos" className="btn btn--ghost">
-          Ver mis pedidos
+        <Link to="/novedades" className="btn btn--ghost">
+          Seguir comprando
         </Link>
       </div>
 

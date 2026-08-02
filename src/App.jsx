@@ -3,7 +3,7 @@ import { Route, Routes } from 'react-router-dom'
 
 import Layout from './components/layout/Layout.jsx'
 import ScrollToTop from './components/ScrollToTop.jsx'
-import { RequireAdmin, RequireAuth } from './components/RouteGuards.jsx'
+import { RequireAdmin } from './components/RouteGuards.jsx'
 import { Loader } from './components/ui/State.jsx'
 
 import Home from './pages/Home.jsx'
@@ -17,11 +17,6 @@ import NotFound from './pages/NotFound.jsx'
 const Checkout = lazy(() => import('./pages/Checkout.jsx'))
 const OrderConfirmation = lazy(() => import('./pages/OrderConfirmation.jsx'))
 const Login = lazy(() => import('./pages/Login.jsx'))
-const Register = lazy(() => import('./pages/Register.jsx'))
-const Account = lazy(() => import('./pages/Account.jsx'))
-const AccountProfile = lazy(() => import('./pages/AccountProfile.jsx'))
-const AccountOrders = lazy(() => import('./pages/AccountOrders.jsx'))
-const OrderDetail = lazy(() => import('./pages/OrderDetail.jsx'))
 const Wishlist = lazy(() => import('./pages/Wishlist.jsx'))
 const Info = lazy(() => import('./pages/Info.jsx'))
 
@@ -49,23 +44,14 @@ export default function App() {
             <Route path=":section" element={<Category />} />
             <Route path=":section/:category" element={<Category />} />
 
-            {/* Compra */}
+            {/* Compra, siempre como invitado */}
             <Route path="cesta" element={<Cart />} />
             <Route path="comprar" element={<Checkout />} />
             <Route path="pedido/:id" element={<OrderConfirmation />} />
-
-            {/* Cuenta */}
-            <Route path="entrar" element={<Login />} />
-            <Route path="registro" element={<Register />} />
             <Route path="favoritos" element={<Wishlist />} />
 
-            <Route element={<RequireAuth />}>
-              <Route path="cuenta" element={<Account />}>
-                <Route index element={<AccountProfile />} />
-                <Route path="pedidos" element={<AccountOrders />} />
-                <Route path="pedidos/:id" element={<OrderDetail />} />
-              </Route>
-            </Route>
+            {/* Acceso del equipo */}
+            <Route path="entrar" element={<Login />} />
 
             {/* Contenido estático */}
             <Route path="info/:page" element={<Info />} />

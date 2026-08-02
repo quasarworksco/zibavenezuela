@@ -1,8 +1,6 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react'
 
-import { useAuth } from './AuthContext.jsx'
 import { useUI } from './UIContext.jsx'
-import { addToWishlist, removeFromWishlist } from '../services/users.js'
 
 const WishlistContext = createContext(null)
 const STORAGE_KEY = 'ziba.wishlist.v1'
@@ -17,34 +15,14 @@ function readStorage() {
   }
 }
 
-/**
- * Favoritos. Sin sesión viven en localStorage; al iniciar sesión se fusionan
- * con los que ya tenga el perfil en Firestore.
- */
+/** Favoritos guardados en el navegador de cada visitante. */
 export function WishlistProvider({ children }) {
-  const { user, profile, refreshProfile } = useAuth()
   const { toast } = useUI()
   const [ids, setIds] = useState([])
 
   useEffect(() => {
     setIds(readStorage())
   }, [])
-
-  // Al entrar con sesión: une lo local con lo guardado en el perfil
-  useEffect(() => {
-    if (!user || !profile) return
-    const remote = Array.isArray(profile.wishlist) ? profile.wishlist : []
-    const local = readStorage()
-    const merged = [...new Set([...remote, ...local])]
-    setIds(merged)
-
-    const missing = local.filter((id) => !remote.includes(id))
-    if (missing.length) {
-      Promise.all(missing.map((id) => addToWishlist(user.uid, id)))
-        .then(refreshProfile)
-        .catch((err) => console.error('No se pudieron sincronizar los favoritos:', err))
-    }
-  }, [user, profile, refreshProfile])
 
   useEffect(() => {
     try {
@@ -57,20 +35,12 @@ export function WishlistProvider({ children }) {
   const has = useCallback((productId) => ids.includes(productId), [ids])
 
   const toggle = useCallback(
-    async (productId) => {
+    (productId) => {
       const isOn = ids.includes(productId)
       setIds((list) => (isOn ? list.filter((id) => id !== productId) : [...list, productId]))
       toast(isOn ? 'Quitado de favoritos' : 'Guardado en favoritos')
-
-      if (user) {
-        try {
-          await (isOn ? removeFromWishlist(user.uid, productId) : addToWishlist(user.uid, productId))
-        } catch (err) {
-          console.error('No se pudo guardar el favorito:', err)
-        }
-      }
     },
-    [ids, user, toast],
+    [ids, toast],
   )
 
   const value = useMemo(() => ({ ids, has, toggle, count: ids.length }), [ids, has, toggle])

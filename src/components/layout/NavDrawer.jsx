@@ -11,7 +11,7 @@ import { useCategories } from '../../hooks/useCategories.js'
 /** Menú lateral: secciones arriba, categorías de la sección activa debajo. */
 export default function NavDrawer() {
   const { panel, closePanel } = useUI()
-  const { user, isAdmin, logout } = useAuth()
+  const { isAdmin, logout } = useAuth()
   const location = useLocation()
   const { bySection, loading } = useCategories()
 
@@ -70,43 +70,38 @@ export default function NavDrawer() {
           ) : null}
         </ul>
 
-        <p className="nav__group-title">Tu cuenta</p>
+        <p className="nav__group-title">Tu selección</p>
         <ul className="nav__list">
-          <li>
-            <Link to={user ? '/cuenta' : '/entrar'} className="nav__link" onClick={closePanel}>
-              {user ? 'Mi cuenta' : 'Iniciar sesión'}
-            </Link>
-          </li>
-          <li>
-            <Link to="/cuenta/pedidos" className="nav__link" onClick={closePanel}>
-              Mis pedidos
-            </Link>
-          </li>
           <li>
             <Link to="/favoritos" className="nav__link" onClick={closePanel}>
               Favoritos
             </Link>
           </li>
+          <li>
+            <Link to="/cesta" className="nav__link" onClick={closePanel}>
+              Cesta
+            </Link>
+          </li>
           {isAdmin ? (
-            <li>
-              <Link to="/admin" className="nav__link" onClick={closePanel}>
-                Administración
-              </Link>
-            </li>
-          ) : null}
-          {user ? (
-            <li>
-              <button
-                type="button"
-                className="nav__link"
-                onClick={() => {
-                  logout()
-                  closePanel()
-                }}
-              >
-                Cerrar sesión
-              </button>
-            </li>
+            <>
+              <li>
+                <Link to="/admin" className="nav__link" onClick={closePanel}>
+                  Administración
+                </Link>
+              </li>
+              <li>
+                <button
+                  type="button"
+                  className="nav__link"
+                  onClick={() => {
+                    logout()
+                    closePanel()
+                  }}
+                >
+                  Cerrar sesión
+                </button>
+              </li>
+            </>
           ) : null}
         </ul>
 

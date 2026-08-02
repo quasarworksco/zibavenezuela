@@ -15,7 +15,7 @@ const LINKS = [
 
 /** Marco del panel: cabecera propia, navegación lateral y contenido. */
 export default function AdminLayout() {
-  const { profile, logout } = useAuth()
+  const { logout } = useAuth()
 
   return (
     <div className="app">
@@ -31,10 +31,8 @@ export default function AdminLayout() {
         </Link>
 
         <div className="header__right">
-          <span className="header__action header__action--hide-sm u-muted">
-            {profile?.displayName || profile?.email}
-          </span>
-          <button type="button" className="header__action" onClick={logout}>
+          <span className="header__action header__action--hide-sm u-muted">adminziba</span>
+          <button type="button" className="header__action" onClick={logout} aria-label="Salir">
             <Icon name="logout" size={16} />
           </button>
         </div>

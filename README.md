@@ -4,8 +4,11 @@ Tienda online de ropa. Catálogo por categorías, carrito, compra y panel de
 administración. Estética en blanco y negro con superficies de vidrio
 (*glassmorphism*) en los elementos flotantes.
 
-**Stack:** React 19 · Vite 7 · React Router 7 · Firebase (Auth + Firestore) ·
+**Stack:** React 19 · Vite 7 · React Router 7 · Firestore (base de datos) ·
 Cloudinary (imágenes) · CSS propio, sin framework.
+
+No hay cuentas de cliente: se compra como invitado. El único acceso es el del
+panel de administración.
 
 ---
 
@@ -13,7 +16,6 @@ Cloudinary (imágenes) · CSS propio, sin framework.
 
 ```bash
 npm install
-cp .env.example .env      # completa los valores
 npm run dev               # http://localhost:5173
 ```
 
@@ -29,14 +31,12 @@ npm run dev               # http://localhost:5173
 
 ## Configuración
 
-### 1. Firebase
+### 1. Firestore
 
 El proyecto ya apunta a `zibavenezuela-fa1e3`. Queda por activar en la consola:
 
-1. **Authentication → Sign-in method:** habilita *Correo/contraseña* y, si lo
-   quieres, *Google*.
-2. **Firestore Database:** crea la base de datos.
-3. **Reglas de seguridad:** publica las de este repositorio.
+1. **Firestore Database:** crea la base de datos.
+2. **Reglas de seguridad:** publica las de este repositorio.
 
    ```bash
    npm install -g firebase-tools
@@ -48,37 +48,33 @@ El proyecto ya apunta a `zibavenezuela-fa1e3`. Queda por activar en la consola:
    Sin este paso el catálogo se ve vacío: Firestore rechaza todas las lecturas
    por defecto.
 
-### 2. Crear el usuario administrador
+No hace falta activar Authentication: la tienda no lo usa.
 
-El formulario de acceso admite el usuario corto: se escribe `adminziba`, sin
-correo. Por dentro se traduce a `adminziba@zibavenezuela.com`, que es lo que
-Firebase necesita (ver `src/lib/auth.js`).
+### 2. Acceso al panel
 
-1. En **Authentication → Users → Add user** crea:
-   - Correo: `adminziba@zibavenezuela.com`
-   - Contraseña: la que vayas a usar
-2. Entra una vez en la tienda con `adminziba` y esa contraseña: se crea su
-   documento en `users/{uid}` con `role: "cliente"`.
-3. En **Firestore**, cambia a mano ese campo a `role: "admin"`.
+Usuario `adminziba`, definido en `src/lib/auth.js` junto a la contraseña. Se
+entra por `/entrar` y la sesión se recuerda en `localStorage`.
 
-Es el único cambio manual del sistema, y a propósito: las reglas impiden que
-nadie se ascienda a sí mismo.
-
-La contraseña nunca vive en el código: la verifica Firebase. Cambiarla se hace
-desde la consola, sin tocar la aplicación ni volver a desplegar.
+> **Ten esto presente.** Las credenciales viajan en el JavaScript de la página:
+> cualquiera que abra las herramientas de desarrollo puede leerlas. Y como
+> Firestore no recibe ninguna identidad, sus reglas no pueden distinguir al
+> administrador de un visitante, así que la escritura del catálogo queda
+> abierta a quien conozca el id del proyecto. Si más adelante quieres cerrarlo,
+> el camino es Firebase Authentication y reglas basadas en `request.auth`.
 
 ### 3. Cloudinary
 
-1. Crea una cuenta y copia el **Cloud name**.
-2. En *Settings → Upload → Upload presets* crea un preset con
-   **Signing Mode: Unsigned** (por ejemplo `ziba_unsigned`).
-3. Rellena en `.env`:
+Ya está configurado y no hace falta tocar nada:
 
-   ```
-   VITE_CLOUDINARY_CLOUD_NAME=tu-cloud
-   VITE_CLOUDINARY_UPLOAD_PRESET=ziba_unsigned
-   VITE_CLOUDINARY_FOLDER=ziba
-   ```
+```
+VITE_CLOUDINARY_CLOUD_NAME=zibave
+VITE_CLOUDINARY_UPLOAD_PRESET=jtdqewim
+VITE_CLOUDINARY_FOLDER=ziba
+```
+
+Ambos valores están como respaldo en `src/lib/cloudinary.js`, así que la subida
+de fotos funciona sin crear `.env`. El preset debe seguir en **Signing Mode:
+Unsigned**; si se cambia a *Signed*, las subidas desde el panel fallarán.
 
 Las fotos se suben desde el panel y en Firestore sólo se guarda su `publicId`.
 Las miniaturas, el `srcset` y el formato (WebP/AVIF) los resuelve Cloudinary al
@@ -86,15 +82,8 @@ vuelo desde `src/lib/cloudinary.js`.
 
 ### 4. Datos de ejemplo (opcional)
 
-Con el administrador ya creado, añade a `.env`:
-
-```
-SEED_ADMIN_EMAIL=tu@correo.com
-SEED_ADMIN_PASSWORD=tu-contraseña
-```
-
-y ejecuta `npm run seed`. Crea 14 categorías y 12 productos sin fotografías,
-listos para completarlos desde el panel.
+Con las reglas ya publicadas, ejecuta `npm run seed`. Crea 14 categorías y 12
+productos sin fotografías, listos para completarlos desde el panel.
 
 ---
 
@@ -103,8 +92,8 @@ listos para completarlos desde el panel.
 ```
 src/
 ├── lib/            firebase, cloudinary, formato, constantes de negocio
-├── services/       acceso a Firestore (products, categories, orders, users…)
-├── context/        Auth, Cart, Wishlist, UI (paneles y avisos)
+├── services/       acceso a Firestore (products, categories, orders…)
+├── context/        Auth (admin), Cart, Wishlist, UI (paneles y avisos)
 ├── hooks/          useCategories (con caché en memoria)
 ├── components/
 │   ├── layout/     Header, NavDrawer, CartDrawer, Footer, Layout
@@ -128,11 +117,10 @@ src/
 | `/buscar?q=`           | Resultados de búsqueda                 |
 | `/cesta`, `/comprar`   | Cesta y tramitación                    |
 | `/pedido/:id`          | Confirmación                           |
-| `/entrar`, `/registro` | Acceso                                 |
-| `/cuenta`              | Datos, pedidos y favoritos *(privado)* |
-| `/favoritos`           | Lista de deseos                        |
+| `/favoritos`           | Lista de deseos (en este navegador)    |
+| `/entrar`              | Acceso del equipo                      |
 | `/info/:pagina`        | Envíos, cambios, tallas, contacto…     |
-| `/admin`               | Panel *(sólo `role: admin`)*           |
+| `/admin`               | Panel *(requiere sesión de admin)*     |
 
 ---
 
@@ -157,12 +145,10 @@ src/
 
 **`categories/{id}`** — `name, slug, section, description, image, order, active`
 
-**`orders/{id}`** — `userId, items[], customer, shipping, payment, subtotal,
+**`orders/{id}`** — `items[], customer, shipping, payment, subtotal,
 shippingCost, total, status, note, createdAt`
 
 Estados: `pendiente → pagado → preparando → enviado → entregado` (+ `cancelado`).
-
-**`users/{uid}`** — `email, displayName, phone, role, address, wishlist[]`
 
 **`newsletter/{email}`** — el correo es el id, así no hay duplicados.
 
@@ -180,10 +166,13 @@ Estados: `pendiente → pagado → preparando → enviado → entregado` (+ `can
 - **Filtros en memoria.** Talla, precio y disponibilidad se aplican en el
   cliente sobre el resultado de la consulta: Firestore no admite combinar varios
   rangos con `orderBy` sin multiplicar los índices.
-- **Rol de administrador.** Ocultar `/admin` es sólo la primera capa; quien
-  manda son las reglas de `firestore.rules`.
-- **Carrito y favoritos sin sesión.** Viven en `localStorage`; al iniciar sesión
-  los favoritos se fusionan con los del perfil.
+- **Sin cuentas de cliente.** Se compra como invitado. El enlace de
+  confirmación (`/pedido/:id`) es la forma de volver a consultar un pedido, así
+  que conviene guardarlo. El seguimiento se coordina por WhatsApp.
+- **Acceso de admin en el navegador.** La sesión no la valida ningún servidor:
+  `RequireAdmin` sólo esconde la sección. Las reglas de Firestore, sin identidad
+  que comprobar, dejan la escritura abierta.
+- **Carrito y favoritos.** Viven en `localStorage`, atados al navegador.
 - **Precios en dólares.** Es la referencia habitual del comercio local. El pago
   en bolívares se acuerda a la tasa del día.
 

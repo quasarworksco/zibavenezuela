@@ -22,7 +22,7 @@ export default function Header() {
   const location = useLocation()
   const { count } = useCart()
   const wishlist = useWishlist()
-  const { user, isAdmin } = useAuth()
+  const { isAdmin } = useAuth()
   const { togglePanel, headerOverlay } = useUI()
 
   useEffect(() => {
@@ -101,13 +101,6 @@ export default function Header() {
         >
           <Icon name="heart" size={19} />
           {wishlist.count > 0 ? <span className="header__count">{wishlist.count}</span> : null}
-        </Link>
-
-        <Link
-          to={user ? '/cuenta' : '/entrar'}
-          className="header__action header__action--hide-sm"
-        >
-          {user ? 'Mi cuenta' : 'Entrar'}
         </Link>
 
         {isAdmin ? (
