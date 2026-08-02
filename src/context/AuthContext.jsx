@@ -1,11 +1,9 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react'
 import {
-  GoogleAuthProvider,
   createUserWithEmailAndPassword,
   onAuthStateChanged,
   sendPasswordResetEmail,
   signInWithEmailAndPassword,
-  signInWithPopup,
   signOut,
   updateProfile,
 } from 'firebase/auth'
@@ -58,12 +56,6 @@ export function AuthProvider({ children }) {
     return cred.user
   }, [])
 
-  const loginWithGoogle = useCallback(async () => {
-    const cred = await signInWithPopup(auth, new GoogleAuthProvider())
-    await ensureUserProfile(cred.user)
-    return cred.user
-  }, [])
-
   const logout = useCallback(() => signOut(auth), [])
 
   const resetPassword = useCallback((email) => sendPasswordResetEmail(auth, email), [])
@@ -88,13 +80,12 @@ export function AuthProvider({ children }) {
       isAdmin: profile?.role === 'admin',
       register,
       login,
-      loginWithGoogle,
       logout,
       resetPassword,
       saveProfile,
       refreshProfile,
     }),
-    [user, profile, loading, register, login, loginWithGoogle, logout, resetPassword, saveProfile, refreshProfile],
+    [user, profile, loading, register, login, logout, resetPassword, saveProfile, refreshProfile],
   )
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>

@@ -50,13 +50,22 @@ El proyecto ya apunta a `zibavenezuela-fa1e3`. Queda por activar en la consola:
 
 ### 2. Crear el usuario administrador
 
-1. En **Authentication** crea un usuario con correo y contraseña.
-2. Entra una vez en la tienda con ese usuario: se crea su documento en
-   `users/{uid}` con `role: "cliente"`.
+El formulario de acceso admite el usuario corto: se escribe `adminziba`, sin
+correo. Por dentro se traduce a `adminziba@zibavenezuela.com`, que es lo que
+Firebase necesita (ver `src/lib/auth.js`).
+
+1. En **Authentication → Users → Add user** crea:
+   - Correo: `adminziba@zibavenezuela.com`
+   - Contraseña: la que vayas a usar
+2. Entra una vez en la tienda con `adminziba` y esa contraseña: se crea su
+   documento en `users/{uid}` con `role: "cliente"`.
 3. En **Firestore**, cambia a mano ese campo a `role: "admin"`.
 
 Es el único cambio manual del sistema, y a propósito: las reglas impiden que
 nadie se ascienda a sí mismo.
+
+La contraseña nunca vive en el código: la verifica Firebase. Cambiarla se hace
+desde la consola, sin tocar la aplicación ni volver a desplegar.
 
 ### 3. Cloudinary
 
