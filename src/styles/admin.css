@@ -1,0 +1,354 @@
+/* ==========================================================================
+   ZIBA — Panel de administración
+   ========================================================================== */
+
+.admin {
+  display: grid;
+  grid-template-columns: 1fr;
+  min-height: calc(100dvh - var(--header-h));
+}
+
+@media (min-width: 900px) {
+  .admin {
+    grid-template-columns: 226px minmax(0, 1fr);
+  }
+}
+
+.admin__side {
+  padding: var(--sp-5) var(--gutter);
+  border-right: 1px solid var(--ink-08);
+  background: var(--glass-bg);
+  -webkit-backdrop-filter: var(--glass-blur-sm);
+  backdrop-filter: var(--glass-blur-sm);
+}
+
+@media (min-width: 900px) {
+  .admin__side {
+    position: sticky;
+    top: var(--header-h);
+    height: calc(100dvh - var(--header-h));
+  }
+}
+
+.admin__brand {
+  font-size: var(--fs-2xs);
+  text-transform: uppercase;
+  letter-spacing: var(--tracking-xwide);
+  color: var(--ink-45);
+  margin-bottom: var(--sp-5);
+}
+
+.admin__nav {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  font-size: var(--fs-xs);
+  text-transform: uppercase;
+  letter-spacing: var(--tracking-wide);
+}
+
+@media (max-width: 899px) {
+  .admin__nav {
+    flex-direction: row;
+    flex-wrap: wrap;
+    gap: var(--sp-4);
+  }
+}
+
+.admin__nav a {
+  padding: 8px 0;
+  color: var(--ink-45);
+  transition: color var(--dur) var(--ease), transform var(--dur) var(--ease);
+}
+
+.admin__nav a:hover {
+  color: var(--ink);
+  transform: translateX(3px);
+}
+
+.admin__nav a.is-active {
+  color: var(--ink);
+  text-decoration: underline;
+  text-underline-offset: 5px;
+}
+
+.admin__main {
+  padding: var(--sp-6) var(--gutter) var(--sp-9);
+  min-width: 0;
+}
+
+.admin__head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--sp-4);
+  margin-bottom: var(--sp-6);
+}
+
+.admin__title {
+  font-size: var(--fs-lg);
+  text-transform: uppercase;
+  letter-spacing: var(--tracking-wide);
+}
+
+/* --- Métricas ------------------------------------------------------------- */
+
+.stats {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+  gap: var(--sp-3);
+  margin-bottom: var(--sp-7);
+}
+
+.stat {
+  background: var(--glass-bg);
+  -webkit-backdrop-filter: var(--glass-blur-sm);
+  backdrop-filter: var(--glass-blur-sm);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius-glass);
+  box-shadow: var(--glass-shadow);
+  padding: var(--sp-4);
+}
+
+.stat__label {
+  font-size: var(--fs-2xs);
+  text-transform: uppercase;
+  letter-spacing: var(--tracking-wide);
+  color: var(--ink-45);
+}
+
+.stat__value {
+  margin-top: var(--sp-2);
+  font-family: var(--font-serif);
+  font-size: var(--fs-2xl);
+  line-height: 1;
+}
+
+/* --- Tabla ---------------------------------------------------------------- */
+
+.table-wrap {
+  overflow-x: auto;
+  border: 1px solid var(--ink-08);
+  background: var(--paper-70);
+}
+
+.table {
+  min-width: 720px;
+  font-size: var(--fs-sm);
+}
+
+.table th {
+  text-align: left;
+  font-weight: 400;
+  font-size: var(--fs-2xs);
+  text-transform: uppercase;
+  letter-spacing: var(--tracking-wide);
+  color: var(--ink-45);
+  padding: var(--sp-3) var(--sp-4);
+  border-bottom: 1px solid var(--ink-08);
+  white-space: nowrap;
+  background: var(--bone);
+}
+
+.table td {
+  padding: var(--sp-3) var(--sp-4);
+  border-bottom: 1px solid var(--ink-05);
+  vertical-align: middle;
+}
+
+.table tbody tr:hover {
+  background: var(--ink-05);
+}
+
+.table__thumb {
+  width: 40px;
+  aspect-ratio: 2 / 3;
+  object-fit: cover;
+  background: var(--bone);
+}
+
+.table__actions {
+  display: flex;
+  gap: var(--sp-3);
+  justify-content: flex-end;
+  white-space: nowrap;
+}
+
+/* --- Formulario admin ----------------------------------------------------- */
+
+.admin-form {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--sp-6);
+  max-width: 1100px;
+}
+
+@media (min-width: 1024px) {
+  .admin-form {
+    grid-template-columns: minmax(0, 1fr) 340px;
+    align-items: start;
+  }
+}
+
+.panel {
+  border: 1px solid var(--ink-08);
+  background: var(--paper-70);
+  padding: var(--sp-5);
+}
+
+.panel + .panel {
+  margin-top: var(--sp-4);
+}
+
+.panel__title {
+  font-size: var(--fs-2xs);
+  text-transform: uppercase;
+  letter-spacing: var(--tracking-xwide);
+  color: var(--ink-45);
+  padding-bottom: var(--sp-3);
+  margin-bottom: var(--sp-4);
+  border-bottom: 1px solid var(--ink-08);
+}
+
+.panel--sticky {
+  position: sticky;
+  top: calc(var(--header-h) + var(--sp-4));
+}
+
+/* --- Subida de imágenes --------------------------------------------------- */
+
+.uploader {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(104px, 1fr));
+  gap: var(--sp-3);
+}
+
+.uploader__drop {
+  aspect-ratio: 2 / 3;
+  display: grid;
+  place-items: center;
+  gap: var(--sp-2);
+  padding: var(--sp-3);
+  border: 1px dashed var(--ink-30);
+  background: var(--glass-bg);
+  -webkit-backdrop-filter: var(--glass-blur-sm);
+  backdrop-filter: var(--glass-blur-sm);
+  font-size: var(--fs-2xs);
+  text-transform: uppercase;
+  letter-spacing: var(--tracking);
+  color: var(--ink-45);
+  text-align: center;
+  cursor: pointer;
+  transition: border-color var(--dur) var(--ease), color var(--dur) var(--ease);
+}
+
+.uploader__drop:hover,
+.uploader__drop.is-over {
+  border-color: var(--ink);
+  color: var(--ink);
+}
+
+.uploader__item {
+  position: relative;
+  aspect-ratio: 2 / 3;
+  background: var(--bone);
+  overflow: hidden;
+}
+
+.uploader__item img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.uploader__bar {
+  position: absolute;
+  inset: auto 0 0 0;
+  height: 2px;
+  background: var(--ink);
+  transition: width 200ms linear;
+}
+
+.uploader__tools {
+  position: absolute;
+  inset: 4px 4px auto 4px;
+  display: flex;
+  justify-content: space-between;
+  gap: 4px;
+  opacity: 0;
+  transition: opacity var(--dur) var(--ease);
+}
+
+.uploader__item:hover .uploader__tools {
+  opacity: 1;
+}
+
+.uploader__btn {
+  width: 24px;
+  height: 24px;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  background: var(--glass-bg-strong);
+  -webkit-backdrop-filter: var(--glass-blur-sm);
+  backdrop-filter: var(--glass-blur-sm);
+  border: 1px solid var(--glass-border);
+  font-size: var(--fs-2xs);
+}
+
+.uploader__btn:hover {
+  background: var(--paper);
+}
+
+.uploader__main-flag {
+  position: absolute;
+  left: 4px;
+  bottom: 6px;
+  padding: 2px 7px;
+  border-radius: var(--radius-pill);
+  background: var(--glass-bg-strong);
+  -webkit-backdrop-filter: var(--glass-blur-sm);
+  backdrop-filter: var(--glass-blur-sm);
+  font-size: var(--fs-2xs);
+  text-transform: uppercase;
+  letter-spacing: var(--tracking);
+}
+
+/* --- Editor de tallas ----------------------------------------------------- */
+
+.sizes-editor {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-2);
+}
+
+.sizes-editor__row {
+  display: grid;
+  grid-template-columns: 1fr 110px 32px;
+  gap: var(--sp-2);
+  align-items: center;
+}
+
+.sizes-editor__row .field__control {
+  min-height: 38px;
+  padding: 8px 10px;
+  font-size: var(--fs-sm);
+}
+
+/* --- Barra de filtros admin ----------------------------------------------- */
+
+.admin-filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--sp-3);
+  margin-bottom: var(--sp-4);
+}
+
+.admin-filters .field__control {
+  min-height: 38px;
+  padding: 8px 12px;
+  font-size: var(--fs-sm);
+  width: auto;
+  min-width: 160px;
+}
