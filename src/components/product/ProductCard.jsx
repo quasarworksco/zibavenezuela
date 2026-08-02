@@ -2,8 +2,10 @@ import { Link } from 'react-router-dom'
 
 import ProductImage from './ProductImage.jsx'
 import Icon, { HeartFilled } from '../ui/Icon.jsx'
-import { formatPrice } from '../../lib/format.js'
+import { formatBs, formatPrice } from '../../lib/format.js'
 import { isSoldOut } from '../../services/products.js'
+import { ratesReady, toBs } from '../../lib/pricing.js'
+import { useRates } from '../../hooks/useRates.js'
 import { useCart } from '../../context/CartContext.jsx'
 import { useWishlist } from '../../context/WishlistContext.jsx'
 
@@ -15,6 +17,7 @@ import { useWishlist } from '../../context/WishlistContext.jsx'
 export default function ProductCard({ product, priority = false }) {
   const { addItem } = useCart()
   const wishlist = useWishlist()
+  const { rates } = useRates()
 
   const soldOut = isSoldOut(product)
   const hasAlt = product.images?.length > 1
@@ -90,6 +93,10 @@ export default function ProductCard({ product, priority = false }) {
           <span>{formatPrice(product.price)}</span>
           {onSale ? <del>{formatPrice(product.compareAtPrice)}</del> : null}
         </p>
+
+        {ratesReady(rates) ? (
+          <p className="card__bs">{formatBs(toBs(product.price, rates.store))}</p>
+        ) : null}
 
         {availableSizes.length > 1 ? (
           <p className="card__sizes">{availableSizes.map((s) => s.size).join(' · ')}</p>

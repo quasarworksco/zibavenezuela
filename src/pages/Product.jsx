@@ -6,10 +6,11 @@ import ProductGrid from '../components/product/ProductGrid.jsx'
 import Icon, { HeartFilled } from '../components/ui/Icon.jsx'
 import { Loader } from '../components/ui/State.jsx'
 import { cldUrl, imageSrc } from '../lib/cloudinary.js'
-import { formatPrice } from '../lib/format.js'
+import { formatBs, formatPrice } from '../lib/format.js'
 import { SECTION_NAMES, STORE } from '../lib/constants.js'
 import { getProductBySlug, isSoldOut, listRelated } from '../services/products.js'
-import { hasWholesale, wholesaleFrom } from '../lib/pricing.js'
+import { hasWholesale, ratesReady, realUsd, toBs, wholesaleFrom } from '../lib/pricing.js'
+import { useRates } from '../hooks/useRates.js'
 import { useCart } from '../context/CartContext.jsx'
 import { useWishlist } from '../context/WishlistContext.jsx'
 import { useUI } from '../context/UIContext.jsx'
@@ -48,6 +49,7 @@ export default function Product() {
   const { addItem } = useCart()
   const wishlist = useWishlist()
   const { toast } = useUI()
+  const { rates } = useRates()
 
   useEffect(() => {
     let active = true
@@ -163,9 +165,25 @@ export default function Product() {
 
           <p className="pdp__price">
             <span>{formatPrice(product.price)}</span>
+            {ratesReady(rates) ? <span className="pdp__price-note">en divisas</span> : null}
             {onSale ? <del>{formatPrice(product.compareAtPrice)}</del> : null}
             {soldOut ? <span className="badge">Agotado</span> : null}
           </p>
+
+          {ratesReady(rates) ? (
+            <div className="prices">
+              <div className="prices__row prices__row--strong">
+                <span className="prices__label">Pagando en bolívares</span>
+                <span>{formatBs(toBs(product.price, rates.store))}</span>
+              </div>
+              {rates.bcv > 0 ? (
+                <div className="prices__row">
+                  <span className="prices__label">Precio real (cambio BCV)</span>
+                  <span>{formatPrice(realUsd(product.price, rates.store, rates.bcv))}</span>
+                </div>
+              ) : null}
+            </div>
+          ) : null}
 
           {hasWholesale(product) ? (
             <p className="alert">

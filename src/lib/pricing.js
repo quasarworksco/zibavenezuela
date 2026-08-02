@@ -43,3 +43,42 @@ export function linePrice(line) {
 export function lineIsWholesale(line) {
   return Boolean(line?.wholesalePrice && line.quantity >= (line.wholesaleFrom ?? Infinity))
 }
+
+/* --------------------------------------------------------------------------
+ * Bolívares
+ *
+ * El precio de un producto se carga en divisas. A partir de ahí:
+ *
+ *   bolívares      = precio en divisas × tasa de la tienda
+ *   precio real $  = bolívares ÷ tasa del BCV
+ *
+ * Sólo se controlan dos números: el precio en divisas y la tasa de la tienda.
+ * La tasa del BCV se usa nada más para expresar la equivalencia, así que el
+ * precio real en dólares se mueve solo cuando el BCV cambia.
+ * ------------------------------------------------------------------------ */
+
+/** Monto en bolívares de un precio en divisas. */
+export function toBs(usd, storeRate) {
+  const rate = Number(storeRate ?? 0)
+  if (!rate || rate <= 0) return 0
+  return Number(usd ?? 0) * rate
+}
+
+/** Equivalente en dólares al cambio oficial de ese monto en bolívares. */
+export function bsToUsd(bs, bcvRate) {
+  const rate = Number(bcvRate ?? 0)
+  if (!rate || rate <= 0) return 0
+  return Number(bs ?? 0) / rate
+}
+
+/** Precio real en dólares: bolívares del producto ÷ tasa del BCV. */
+export function realUsd(usd, storeRate, bcvRate) {
+  const bs = toBs(usd, storeRate)
+  if (!bs) return Number(usd ?? 0)
+  return bsToUsd(bs, bcvRate) || Number(usd ?? 0)
+}
+
+/** ¿Hay tasas suficientes para mostrar precios en bolívares? */
+export function ratesReady(rates) {
+  return Boolean(rates?.store && rates.store > 0)
+}

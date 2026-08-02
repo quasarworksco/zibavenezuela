@@ -511,6 +511,11 @@ textarea.field__control {
   color: var(--ink-45);
 }
 
+.card__bs {
+  font-size: var(--fs-xs);
+  color: var(--ink-60);
+}
+
 .card__sizes {
   font-size: var(--fs-2xs);
   color: var(--ink-45);

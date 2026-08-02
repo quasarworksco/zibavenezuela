@@ -26,6 +26,7 @@ const AdminProducts = lazy(() => import('./pages/admin/Products.jsx'))
 const AdminProductForm = lazy(() => import('./pages/admin/ProductForm.jsx'))
 const AdminCategories = lazy(() => import('./pages/admin/Categories.jsx'))
 const AdminOrders = lazy(() => import('./pages/admin/Orders.jsx'))
+const AdminRates = lazy(() => import('./pages/admin/Rates.jsx'))
 
 export default function App() {
   return (
@@ -68,6 +69,7 @@ export default function App() {
               <Route path="productos/:id" element={<AdminProductForm />} />
               <Route path="categorias" element={<AdminCategories />} />
               <Route path="pedidos" element={<AdminOrders />} />
+              <Route path="tasas" element={<AdminRates />} />
             </Route>
           </Route>
         </Routes>

@@ -3,9 +3,10 @@ import { Link, Navigate, useNavigate } from 'react-router-dom'
 
 import Icon from '../components/ui/Icon.jsx'
 import { cldUrl } from '../lib/cloudinary.js'
-import { formatPrice } from '../lib/format.js'
+import { formatBs, formatPrice } from '../lib/format.js'
 import { ESTADOS_VE, PAYMENT_METHODS, SHIPPING_METHODS } from '../lib/constants.js'
-import { linePrice } from '../lib/pricing.js'
+import { linePrice, ratesReady, toBs } from '../lib/pricing.js'
+import { useRates } from '../hooks/useRates.js'
 import { createOrder } from '../services/orders.js'
 import { useCart } from '../context/CartContext.jsx'
 import { useUI } from '../context/UIContext.jsx'
@@ -27,6 +28,7 @@ const EMPTY_FORM = {
 export default function Checkout() {
   const { items, subtotal, clear } = useCart()
   const { toast } = useUI()
+  const { rates } = useRates()
   const navigate = useNavigate()
 
   const [form, setForm] = useState(EMPTY_FORM)
@@ -102,6 +104,7 @@ export default function Checkout() {
         },
         shippingCost,
         note: form.note.trim(),
+        rates: ratesReady(rates) ? rates : null,
       })
 
       clear()
@@ -344,6 +347,12 @@ export default function Checkout() {
               <span>Total</span>
               <span>{formatPrice(total)}</span>
             </div>
+            {ratesReady(rates) ? (
+              <div className="totals__row">
+                <span>A pagar en bolívares</span>
+                <span>{formatBs(toBs(total, rates.store))}</span>
+              </div>
+            ) : null}
           </div>
 
           {failure ? (

@@ -14,6 +14,17 @@ export function formatPrice(value) {
   return money.format(n)
 }
 
+const bolivares = new Intl.NumberFormat('es-VE', {
+  minimumFractionDigits: 2,
+  maximumFractionDigits: 2,
+})
+
+/** Formatea un monto en bolívares. */
+export function formatBs(value) {
+  const n = Number(value)
+  return `Bs ${bolivares.format(Number.isFinite(n) ? n : 0)}`
+}
+
 const dateFmt = new Intl.DateTimeFormat('es-VE', {
   day: '2-digit',
   month: 'long',

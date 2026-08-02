@@ -65,6 +65,19 @@ service cloud.firestore {
       allow delete: if false;
     }
 
+    // --- Ajustes de la tienda ---------------------------------------------
+
+    // Sólo existe `settings/rates`: las tasas de cambio. Las lee la tienda
+    // para mostrar precios en bolívares y las escribe el panel.
+    match /settings/{docId} {
+      allow read: if true;
+      allow create, update: if request.resource.data.store is number
+                            && request.resource.data.store >= 0
+                            && request.resource.data.bcv is number
+                            && request.resource.data.bcv >= 0;
+      allow delete: if false;
+    }
+
     // --- Newsletter -------------------------------------------------------
 
     match /newsletter/{email} {

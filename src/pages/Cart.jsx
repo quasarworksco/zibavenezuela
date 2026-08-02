@@ -3,13 +3,15 @@ import { Link } from 'react-router-dom'
 import Icon from '../components/ui/Icon.jsx'
 import { Empty } from '../components/ui/State.jsx'
 import { cldUrl } from '../lib/cloudinary.js'
-import { formatPrice } from '../lib/format.js'
-import { lineIsWholesale, linePrice } from '../lib/pricing.js'
+import { formatBs, formatPrice } from '../lib/format.js'
+import { lineIsWholesale, linePrice, ratesReady, toBs } from '../lib/pricing.js'
+import { useRates } from '../hooks/useRates.js'
 import { useCart } from '../context/CartContext.jsx'
 
 /** Página de la cesta, con el resumen fijo a un lado. */
 export default function Cart() {
   const { items, count, subtotal, setQuantity, removeItem } = useCart()
+  const { rates } = useRates()
 
   if (!items.length) {
     return (
@@ -116,6 +118,12 @@ export default function Cart() {
               <span>Total</span>
               <span>{formatPrice(subtotal)}</span>
             </div>
+            {ratesReady(rates) ? (
+              <div className="totals__row">
+                <span>En bolívares</span>
+                <span>{formatBs(toBs(subtotal, rates.store))}</span>
+              </div>
+            ) : null}
           </div>
 
           <p className="field__hint" style={{ marginTop: '1rem' }}>

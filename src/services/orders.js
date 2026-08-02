@@ -13,7 +13,7 @@ import {
 } from 'firebase/firestore'
 
 import { COL, db } from '../lib/firebase.js'
-import { lineIsWholesale, linePrice } from '../lib/pricing.js'
+import { lineIsWholesale, linePrice, realUsd, toBs } from '../lib/pricing.js'
 
 const ordersRef = collection(db, COL.orders)
 
@@ -28,6 +28,7 @@ function mapOrder(snap) {
     subtotal: Number(data.subtotal ?? 0),
     shippingCost: Number(data.shippingCost ?? 0),
     total: Number(data.total ?? 0),
+    rates: data.rates ?? null,
     status: data.status ?? 'pendiente',
     note: data.note ?? '',
     createdAt: data.createdAt ?? null,
@@ -46,6 +47,7 @@ export async function createOrder({
   payment,
   shippingCost = 0,
   note = '',
+  rates = null,
 }) {
   const lines = items.map((item) => ({
     productId: item.productId,
@@ -71,6 +73,16 @@ export async function createOrder({
     subtotal,
     shippingCost: cost,
     total: subtotal + cost,
+    // Se congelan las tasas del momento: un pedido viejo debe poder
+    // reconstruirse aunque después cambien
+    rates: rates
+      ? {
+          store: Number(rates.store ?? 0),
+          bcv: Number(rates.bcv ?? 0),
+          totalBs: toBs(subtotal + cost, rates.store),
+          totalRealUsd: realUsd(subtotal + cost, rates.store, rates.bcv),
+        }
+      : null,
     status: 'pendiente',
     note,
     createdAt: serverTimestamp(),
