@@ -202,6 +202,7 @@
 /* --- Barra de anuncios ---------------------------------------------------- */
 
 .announce {
+  display: block;
   background: var(--ink);
   color: var(--paper);
   text-align: center;
@@ -209,6 +210,24 @@
   text-transform: uppercase;
   letter-spacing: var(--tracking-xwide);
   padding: 9px var(--gutter);
+  transition: opacity var(--dur) var(--ease);
+}
+
+.announce:hover {
+  opacity: 0.75;
+}
+
+/* Acceso al mayor en la cabecera: subrayado para que no pase por otro más */
+.header__mayor {
+  border-bottom: 1px solid currentColor;
+  padding-bottom: 2px;
+}
+
+@media (max-width: 767px) {
+  /* En el móvil manda la barra superior y el menú: la cabecera va justa */
+  .header__mayor {
+    display: none;
+  }
 }
 
 /* --- Drawer de navegación (glass) ---------------------------------------- */

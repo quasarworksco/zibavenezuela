@@ -57,10 +57,31 @@ export default function Cart() {
                     {lineIsWholesale(line) ? ' · precio al mayor' : ''}
                   </p>
                   {!lineIsWholesale(line) && line.wholesalePrice ? (
-                    <p className="line__meta">
-                      Lleva {line.wholesaleFrom} o más y pagas{' '}
-                      {formatPrice(line.wholesalePrice)} cada una.
-                    </p>
+                    <div className="upsell">
+                      <p className="upsell__text">
+                        Te {line.wholesaleFrom - line.quantity === 1 ? 'falta' : 'faltan'}{' '}
+                        <strong>
+                          {line.wholesaleFrom - line.quantity}{' '}
+                          {line.wholesaleFrom - line.quantity === 1 ? 'unidad' : 'unidades'}
+                        </strong>{' '}
+                        para el precio al mayor: {formatPrice(line.wholesalePrice)} cada una en vez
+                        de {formatPrice(line.price)}. Ahorras{' '}
+                        {formatPrice((line.price - line.wholesalePrice) * line.wholesaleFrom)}.
+                      </p>
+                      <button
+                        type="button"
+                        className="btn btn--sm"
+                        onClick={() => setQuantity(line.key, line.wholesaleFrom)}
+                        disabled={line.wholesaleFrom > (line.maxQuantity ?? 99)}
+                      >
+                        Llevar {line.wholesaleFrom}
+                      </button>
+                      {line.wholesaleFrom > (line.maxQuantity ?? 99) ? (
+                        <p className="upsell__text u-muted">
+                          Ahora mismo sólo quedan {line.maxQuantity} de esta talla.
+                        </p>
+                      ) : null}
+                    </div>
                   ) : null}
 
                   <div className="line__foot">

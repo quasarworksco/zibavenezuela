@@ -18,6 +18,7 @@ const MAX_FOTOS = 8
 export default function Home() {
   const [featured, setFeatured] = useState([])
   const [latest, setLatest] = useState([])
+  const [mayor, setMayor] = useState([])
   const [loading, setLoading] = useState(true)
   const { categories } = useCategories()
   const { setHeaderOverlay } = useUI()
@@ -25,11 +26,16 @@ export default function Home() {
   useEffect(() => {
     let active = true
 
-    Promise.all([listProducts({ featured: true, max: 8 }), listProducts({ max: 8, sort: 'nuevo' })])
-      .then(([f, l]) => {
+    Promise.all([
+      listProducts({ featured: true, max: 8 }),
+      listProducts({ max: 8, sort: 'nuevo' }),
+      listProducts({ wholesale: true, max: 8 }),
+    ])
+      .then(([f, l, m]) => {
         if (!active) return
         setFeatured(f)
         setLatest(l)
+        setMayor(m)
       })
       .catch((err) => console.error('No se pudo cargar la portada:', err))
       .finally(() => {
@@ -210,6 +216,23 @@ export default function Home() {
           <Icon name="whatsapp" size={15} /> {BAND.cta}
         </a>
       </section>
+
+      {/* Lo que hay al mayor, por delante de la selección general */}
+      {mayor.length ? (
+        <section className="section">
+          <div className="section__head">
+            <h2 className="section__title">Al mayor</h2>
+            <Link to={TIERS.mayor.to} className="section__link">
+              Ver todo
+            </Link>
+          </div>
+          <p className="section__lead">
+            Precio por unidad rebajado a partir de la cantidad mínima de cada prenda.
+          </p>
+
+          <ProductGrid products={mayor} loading={false} />
+        </section>
+      ) : null}
 
       <section className="section">
         <div className="section__head">

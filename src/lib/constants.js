@@ -130,9 +130,9 @@ export const SORT_OPTIONS = [
  * El título se parte en dos líneas.
  */
 export const HERO = {
-  eyebrow: 'ZIBA Venezuela',
-  title: ['Moda', 'para todos'],
-  text: 'Ropa de tendencia para mujer, hombre y niños. Al detal y al mayor, con envíos a todo el país.',
+  eyebrow: 'Mayoristas y detal',
+  title: ['Surte', 'tu negocio'],
+  text: 'Ropa de tendencia para mujer, hombre y niños con precio especial al mayor. También vendemos al detal, desde una sola pieza. Envíos a todo el país.',
 }
 
 /** Franja negra de la portada: cierra la venta al mayor por WhatsApp. */
@@ -165,7 +165,7 @@ export const TIERS = {
 }
 
 /** Frase de la barra superior. */
-export const ANNOUNCE = 'Envíos a toda Venezuela · Precios especiales al mayor'
+export const ANNOUNCE = 'Precios especiales al mayor · Envíos a toda Venezuela'
 
 /** Crédito que aparece en el pie de página. */
 export const CREDIT = 'Hecho por DGP Global Group · Florida, USA'

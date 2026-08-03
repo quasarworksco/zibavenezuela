@@ -186,10 +186,20 @@ export default function Product() {
           ) : null}
 
           {hasWholesale(product) ? (
-            <p className="alert">
-              <strong>Al mayor: {formatPrice(product.wholesalePrice)}</strong> por unidad llevando{' '}
-              {wholesaleFrom(product)} o más. Se aplica solo en la cesta.
-            </p>
+            <div className="mayor-box">
+              <p className="mayor-box__eyebrow">Precio al mayor</p>
+              <p className="mayor-box__price">
+                {formatPrice(product.wholesalePrice)}
+                <span> / unidad desde {wholesaleFrom(product)} piezas</span>
+              </p>
+              <p className="mayor-box__text">
+                Ahorras {formatPrice(product.price - product.wholesalePrice)} por pieza. El precio se
+                aplica solo en la cesta, al llegar a la cantidad.
+              </p>
+              <Link to="/mayor" className="mayor-box__link">
+                Ver todo lo que hay al mayor
+              </Link>
+            </div>
           ) : null}
 
           {product.sku ? <p className="listing__count">Ref. {product.sku}</p> : null}

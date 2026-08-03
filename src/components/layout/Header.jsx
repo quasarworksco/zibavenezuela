@@ -3,6 +3,7 @@ import { Link, useLocation, useNavigate } from 'react-router-dom'
 
 import Logo from '../ui/Logo.jsx'
 import Icon from '../ui/Icon.jsx'
+import { TIERS } from '../../lib/constants.js'
 import { useCart } from '../../context/CartContext.jsx'
 import { useWishlist } from '../../context/WishlistContext.jsx'
 import { useAuth } from '../../context/AuthContext.jsx'
@@ -78,6 +79,11 @@ export default function Header() {
         >
           Buscar
         </button>
+
+        {/* Acceso fijo a la venta al mayor: es lo principal de la tienda */}
+        <Link to={TIERS.mayor.to} className="header__action header__mayor">
+          Al mayor
+        </Link>
       </div>
 
       <Link to="/" className="header__brand" aria-label="ZIBA — Inicio">

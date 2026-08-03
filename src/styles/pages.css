@@ -274,6 +274,62 @@
   }
 }
 
+/* --- Bloque de precio al mayor en la ficha -------------------------------- */
+
+.mayor-box {
+  padding: var(--sp-4);
+  background: var(--ink);
+  color: var(--paper);
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-2);
+}
+
+.mayor-box__eyebrow {
+  font-size: var(--fs-2xs);
+  text-transform: uppercase;
+  letter-spacing: var(--tracking-xwide);
+  opacity: 0.65;
+}
+
+.mayor-box__price {
+  font-size: var(--fs-xl);
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: var(--sp-2);
+}
+
+.mayor-box__price span {
+  font-size: var(--fs-sm);
+  color: rgba(255, 255, 255, 0.72);
+}
+
+.mayor-box__text {
+  font-size: var(--fs-sm);
+  line-height: 1.5;
+  color: rgba(255, 255, 255, 0.72);
+}
+
+.mayor-box__link {
+  align-self: flex-start;
+  font-size: var(--fs-2xs);
+  text-transform: uppercase;
+  letter-spacing: var(--tracking-wide);
+  border-bottom: 1px solid currentColor;
+  padding-bottom: 2px;
+}
+
+/* Entradilla bajo el título de una sección */
+.section__lead {
+  margin-top: calc(-1 * var(--sp-2));
+  margin-bottom: var(--sp-4);
+  padding-inline: var(--gutter);
+  max-width: 62ch;
+  font-size: var(--fs-md);
+  color: var(--ink-60);
+}
+
 /* --- Franja negra --------------------------------------------------------- */
 
 .band {

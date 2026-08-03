@@ -327,6 +327,23 @@ textarea.field__control {
   margin-bottom: var(--sp-4);
 }
 
+/* --- Empujón al precio al mayor en la cesta ------------------------------- */
+
+.upsell {
+  margin-top: var(--sp-3);
+  padding: var(--sp-3);
+  border: 1px solid var(--ink);
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--sp-2);
+}
+
+.upsell__text {
+  font-size: var(--fs-sm);
+  line-height: 1.5;
+}
+
 /* --- Tarjeta de vidrio genérica ------------------------------------------ */
 
 .glass-card {
