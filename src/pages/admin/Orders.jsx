@@ -4,7 +4,7 @@ import Modal from '../../components/ui/Modal.jsx'
 import Icon from '../../components/ui/Icon.jsx'
 import { Loader } from '../../components/ui/State.jsx'
 import { cldUrl } from '../../lib/cloudinary.js'
-import { formatDateTime, formatPrice, orderRef } from '../../lib/format.js'
+import { formatBs, formatDateTime, formatPrice, orderRef } from '../../lib/format.js'
 import { ORDER_STATUS, ORDER_STATUS_LIST, STORE } from '../../lib/constants.js'
 import { listOrdersAdmin, updateOrderStatus, whatsappMessage } from '../../services/orders.js'
 import { useUI } from '../../context/UIContext.jsx'
@@ -228,6 +228,27 @@ export default function Orders() {
                 <span>Total</span>
                 <span>{formatPrice(selected.total)}</span>
               </div>
+
+              {/* Las tasas quedaron congeladas al cerrar la venta: se muestran
+                  las de ese momento, no las de hoy. */}
+              {selected.rates ? (
+                <>
+                  <div className="totals__row">
+                    <span>Total en bolívares</span>
+                    <span>{formatBs(selected.rates.totalBs)}</span>
+                  </div>
+                  <div className="totals__row">
+                    <span>Total real</span>
+                    <span>{formatPrice(selected.rates.totalRealUsd)}</span>
+                  </div>
+                  <div className="totals__row u-muted" style={{ fontSize: 'var(--fs-xs)' }}>
+                    <span>Tasas del pedido</span>
+                    <span>
+                      ZIBA {selected.rates.store} · BCV {selected.rates.bcv}
+                    </span>
+                  </div>
+                </>
+              ) : null}
             </div>
 
             {selected.note ? (
