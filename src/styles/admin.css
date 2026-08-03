@@ -392,6 +392,68 @@
   letter-spacing: var(--tracking);
 }
 
+/* --- Carga masiva --------------------------------------------------------- */
+
+.progress {
+  height: 2px;
+  margin-top: var(--sp-2);
+  background: var(--ink-08);
+}
+
+.progress span {
+  display: block;
+  height: 100%;
+  background: var(--ink);
+  transition: width 200ms linear;
+}
+
+.bulk {
+  display: grid;
+  gap: var(--sp-3);
+}
+
+.bulk__item {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-3);
+  padding: var(--sp-2);
+  border: 1px solid var(--ink-08);
+  background: var(--paper-70);
+}
+
+/* Marca los que aún no se pueden crear */
+.bulk__item--falta {
+  border-left: 2px solid var(--ink);
+}
+
+.bulk__thumb {
+  width: 46px;
+  aspect-ratio: 2 / 3;
+  object-fit: cover;
+  background: var(--bone);
+  flex: 0 0 auto;
+}
+
+.bulk__campos {
+  flex: 1;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 110px;
+  gap: var(--sp-2);
+  min-width: 0;
+}
+
+.bulk__campos .field__control {
+  min-height: 38px;
+  padding: 8px 10px;
+  font-size: var(--fs-sm);
+}
+
+@media (max-width: 640px) {
+  .bulk__campos {
+    grid-template-columns: 1fr;
+  }
+}
+
 /* --- Editor de tallas ----------------------------------------------------- */
 
 .sizes-editor {

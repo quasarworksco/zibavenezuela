@@ -9,6 +9,7 @@ import { useAuth } from '../../context/AuthContext.jsx'
 const LINKS = [
   { to: '/admin', label: 'Resumen', icon: 'chart', end: true },
   { to: '/admin/productos', label: 'Productos', icon: 'tag' },
+  { to: '/admin/carga', label: 'Carga masiva', icon: 'image' },
   { to: '/admin/categorias', label: 'Categorías', icon: 'grid' },
   { to: '/admin/pedidos', label: 'Pedidos', icon: 'box' },
   { to: '/admin/tasas', label: 'Tasas', icon: 'chart' },
