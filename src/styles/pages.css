@@ -168,7 +168,8 @@
 .split {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 2px;
+  gap: var(--sp-2);
+  padding-inline: var(--gutter);
 }
 
 @media (max-width: 767px) {
@@ -438,8 +439,9 @@
 /* El mosaico sólo existe en escritorio; en móvil manda el carrusel */
 .pdp__gallery {
   display: none;
-  gap: 2px;
+  gap: var(--sp-2);
   grid-template-columns: 1fr 1fr;
+  padding-inline: var(--gutter);
 }
 
 @media (min-width: 1024px) {
@@ -485,7 +487,8 @@
 .pdp__slider {
   display: flex;
   flex-direction: column;
-  gap: 2px;
+  gap: var(--sp-2);
+  padding-inline: var(--gutter);
 }
 
 .pdp__slide {

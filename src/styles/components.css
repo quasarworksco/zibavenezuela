@@ -546,14 +546,15 @@ textarea.field__control {
 
 .grid {
   display: grid;
-  gap: 2px;
+  gap: var(--sp-2);
   grid-template-columns: repeat(2, 1fr);
+  padding-inline: var(--gutter);
 }
 
 @media (min-width: 768px) {
   .grid {
     grid-template-columns: repeat(3, 1fr);
-    gap: 4px;
+    gap: var(--sp-3);
   }
 }
 

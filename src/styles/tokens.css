@@ -68,7 +68,7 @@
   --sp-9: 6rem;
   --sp-10: 8rem;
 
-  --gutter: clamp(1rem, 3vw, 2.5rem);
+  --gutter: clamp(1.25rem, 3vw, 2.5rem);
   --header-h: 68px;
 
   /* --- Otros -------------------------------------------------------------- */
