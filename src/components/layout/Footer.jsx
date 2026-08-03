@@ -115,13 +115,15 @@ export default function Footer() {
           <div>
             <p className="footer__col-title">Síguenos</p>
             <div className="footer__links">
-              <a
-                href={`https://instagram.com/${STORE.instagram}`}
-                target="_blank"
-                rel="noreferrer noopener"
-              >
-                <Icon name="instagram" size={14} /> Instagram
-              </a>
+              {STORE.instagram ? (
+                <a
+                  href={`https://instagram.com/${STORE.instagram}`}
+                  target="_blank"
+                  rel="noreferrer noopener"
+                >
+                  <Icon name="instagram" size={14} /> Instagram
+                </a>
+              ) : null}
               <a
                 href={`https://wa.me/${STORE.whatsapp}`}
                 target="_blank"

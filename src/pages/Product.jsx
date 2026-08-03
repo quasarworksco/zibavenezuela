@@ -42,6 +42,7 @@ export default function Product() {
   const [related, setRelated] = useState([])
   const [loading, setLoading] = useState(true)
   const [size, setSize] = useState('')
+  const [qty, setQty] = useState(1)
   const [colorIndex, setColorIndex] = useState(0)
   const [sizeError, setSizeError] = useState(false)
   const [zoom, setZoom] = useState(null)
@@ -56,6 +57,7 @@ export default function Product() {
     setLoading(true)
     setProduct(null)
     setSize('')
+    setQty(1)
     setSizeError(false)
 
     getProductBySlug(slug)
@@ -89,6 +91,15 @@ export default function Product() {
     }
   }, [product])
 
+  // Al cambiar de talla la cantidad puede quedar por encima de lo que hay.
+  // Va con el resto de hooks: después de los retornos de abajo no se ejecutaría
+  // en todos los renders.
+  const stockElegido = Number(product?.sizes?.find((s) => s.size === size)?.stock ?? 0)
+  const topeTalla = product?.sizes?.length ? Math.max(stockElegido, 0) : 99
+  useEffect(() => {
+    setQty((n) => Math.min(n, topeTalla || 99) || 1)
+  }, [topeTalla])
+
   if (loading) return <Loader label="Cargando producto" />
   if (!product) return <NotFound />
 
@@ -97,6 +108,10 @@ export default function Product() {
   const isFavourite = wishlist.has(product.id)
   const images = product.images?.length ? product.images : [null]
 
+  // Tope de unidades: lo que quede de la talla elegida
+  const maxQty = topeTalla
+  const puedeMayor = hasWholesale(product) && wholesaleFrom(product) <= (maxQty || 99)
+
   const handleAdd = () => {
     const needsSize = product.sizes.length > 0
     if (needsSize && !size) {
@@ -104,7 +119,11 @@ export default function Product() {
       toast('Selecciona una talla')
       return
     }
-    addItem(product, { size, color: product.colors?.[colorIndex]?.name ?? '' })
+    addItem(product, {
+      size,
+      color: product.colors?.[colorIndex]?.name ?? '',
+      quantity: qty,
+    })
   }
 
   return (
@@ -262,6 +281,53 @@ export default function Product() {
             </div>
           ) : null}
 
+          {!soldOut ? (
+            <div className="pdp__qty">
+              <span className="field__label" style={{ marginBottom: 0 }}>
+                Cantidad
+              </span>
+
+              <div className="qty">
+                <button
+                  type="button"
+                  className="qty__btn"
+                  onClick={() => setQty((n) => Math.max(1, n - 1))}
+                  disabled={qty <= 1}
+                  aria-label="Quitar una unidad"
+                >
+                  −
+                </button>
+                <span className="qty__value">{qty}</span>
+                <button
+                  type="button"
+                  className="qty__btn"
+                  onClick={() => setQty((n) => Math.min(maxQty || 99, n + 1))}
+                  disabled={qty >= (maxQty || 99)}
+                  aria-label="Añadir una unidad"
+                >
+                  +
+                </button>
+              </div>
+
+              {/* Atajo al mínimo del mayor: es la venta que interesa */}
+              {puedeMayor && qty < wholesaleFrom(product) ? (
+                <button
+                  type="button"
+                  className="btn btn--sm btn--ghost"
+                  onClick={() => setQty(wholesaleFrom(product))}
+                >
+                  Llevar {wholesaleFrom(product)} al mayor
+                </button>
+              ) : null}
+
+              {size && maxQty > 0 && qty >= maxQty ? (
+                <p className="field__hint" style={{ marginTop: 0 }}>
+                  Es todo lo que queda en talla {size}.
+                </p>
+              ) : null}
+            </div>
+          ) : null}
+
           <div className="pdp__actions" style={{ marginTop: '0.5rem' }}>
             <button
               type="button"
@@ -269,7 +335,7 @@ export default function Product() {
               onClick={handleAdd}
               disabled={soldOut}
             >
-              {soldOut ? 'Agotado' : 'Añadir a la cesta'}
+              {soldOut ? 'Agotado' : `Añadir ${qty > 1 ? `${qty} a la cesta` : 'a la cesta'}`}
             </button>
 
             <button

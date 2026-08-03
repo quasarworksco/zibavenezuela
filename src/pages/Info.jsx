@@ -212,7 +212,7 @@ const PAGES = {
 
         <h2>Dónde estamos</h2>
         <p>
-          Operamos en línea para toda Venezuela desde Caracas. Escríbenos por WhatsApp o Instagram
+          Operamos en línea para toda Venezuela desde Caracas. Escríbenos por WhatsApp o correo
           cuando lo necesites.
         </p>
       </>
@@ -244,17 +244,19 @@ const PAGES = {
               {STORE.email}
             </a>
           </li>
-          <li>
-            Instagram:{' '}
-            <a
-              className="u-link"
-              href={`https://instagram.com/${STORE.instagram}`}
-              target="_blank"
-              rel="noreferrer noopener"
-            >
-              @{STORE.instagram}
-            </a>
-          </li>
+          {STORE.instagram ? (
+            <li>
+              Instagram:{' '}
+              <a
+                className="u-link"
+                href={`https://instagram.com/${STORE.instagram}`}
+                target="_blank"
+                rel="noreferrer noopener"
+              >
+                @{STORE.instagram}
+              </a>
+            </li>
+          ) : null}
         </ul>
 
         <h2>Pedidos en curso</h2>

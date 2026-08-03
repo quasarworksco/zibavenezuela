@@ -274,6 +274,19 @@
   }
 }
 
+/* Selector de cantidad de la ficha */
+.pdp__qty {
+  margin-top: var(--sp-4);
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--sp-3);
+}
+
+.pdp__qty .field__hint {
+  flex: 1 0 100%;
+}
+
 /* --- Bloque de precio al mayor en la ficha -------------------------------- */
 
 .mayor-box {

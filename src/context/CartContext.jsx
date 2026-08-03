@@ -27,7 +27,8 @@ function reducer(state, action) {
             : l,
         )
       }
-      return [...state, line]
+      // También al entrar por primera vez: nadie puede pedir más de lo que hay
+      return [...state, { ...line, quantity: Math.min(line.quantity, line.maxQuantity ?? 99) }]
     }
 
     case 'setQuantity':

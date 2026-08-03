@@ -568,15 +568,34 @@ textarea.field__control {
   color: var(--ink-60);
 }
 
-/* Precio al mayor: se marca con un filete para que salte a la vista */
+/* Precio al mayor: se marca con un filete para que salte a la vista.
+   El recuadro ocupa todo el ancho de la tarjeta en vez de ajustarse al texto:
+   así, cuando no cabe en una línea, las dos quedan alineadas y el bloque no
+   se ve descuadrado. */
 .card__mayor {
-  align-self: flex-start;
+  align-self: stretch;
   margin-top: var(--sp-1);
-  padding: 3px var(--sp-2);
+  padding: 4px var(--sp-2);
   border: 1px solid var(--ink);
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1px var(--sp-2);
   font-size: var(--fs-2xs);
   text-transform: uppercase;
-  letter-spacing: var(--tracking);
+  letter-spacing: 0.04em;
+  line-height: 1.35;
+}
+
+.card__mayor span {
+  white-space: nowrap;
+}
+
+/* Con la tarjeta ancha sí cabe todo seguido, y luce mejor ajustado */
+@media (min-width: 1024px) {
+  .card__mayor {
+    align-self: flex-start;
+    letter-spacing: var(--tracking);
+  }
 }
 
 .card__sizes {

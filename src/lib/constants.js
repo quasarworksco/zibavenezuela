@@ -175,5 +175,7 @@ export const STORE = {
   name: 'ZIBA VENEZUELA',
   whatsapp: import.meta.env.VITE_STORE_WHATSAPP ?? '584143776372',
   email: import.meta.env.VITE_STORE_EMAIL ?? 'zibavenezuelaoficial@gmail.com',
-  instagram: import.meta.env.VITE_STORE_INSTAGRAM ?? 'zibavenezuela',
+  // Sin usuario de Instagram todavía. Mientras esté vacío no se enlaza en
+  // ninguna parte; basta con ponerlo aquí para que vuelva a aparecer.
+  instagram: import.meta.env.VITE_STORE_INSTAGRAM ?? '',
 }

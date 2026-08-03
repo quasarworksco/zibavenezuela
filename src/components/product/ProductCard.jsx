@@ -102,8 +102,11 @@ export default function ProductCard({ product, priority = false }) {
         ) : null}
 
         {hasWholesale(product) ? (
+          // Dos trozos indivisibles: si no caben en una línea, se parte entre
+          // ellos y nunca dentro, que era lo que dejaba la «u.» suelta abajo.
           <p className="card__mayor">
-            Al mayor {formatPrice(product.wholesalePrice)} · desde {wholesaleFrom(product)} u.
+            <span>Al mayor {formatPrice(product.wholesalePrice)}</span>
+            <span>desde {wholesaleFrom(product)} u.</span>
           </p>
         ) : null}
 
