@@ -46,6 +46,7 @@ export default function Bulk() {
   const [creando, setCreando] = useState(null)
   const [resumen, setResumen] = useState(null)
   const [errores, setErrores] = useState([])
+  const [prefijo, setPrefijo] = useState('')
   const inputRef = useRef(null)
   const { categories } = useCategories()
   const { toast } = useUI()
@@ -104,6 +105,23 @@ export default function Bulk() {
   }
 
   const quitar = (key) => setBorradores((list) => list.filter((d) => d.key !== key))
+
+  /**
+   * Nombra todas las fotos en serie: "Vestido 01", "Vestido 02"…
+   * Con nombres de archivo que son sólo números, escribir un prefijo y
+   * numerar es mucho más rápido que teclear ochenta veces.
+   */
+  const nombrarEnSerie = () => {
+    const base = prefijo.trim()
+    if (!base) {
+      toast('Escribe un prefijo primero')
+      return
+    }
+    setBorradores((list) =>
+      list.map((d, i) => ({ ...d, name: `${base} ${String(i + 1).padStart(2, '0')}` })),
+    )
+    toast(`${borradores.length} nombrados`)
+  }
 
   /** Copia el precio de la primera fila a todas las que estén vacías. */
   const rellenarPrecios = () => {
@@ -398,9 +416,28 @@ export default function Bulk() {
               3 · {borradores.length} foto{borradores.length === 1 ? '' : 's'} lista
               {borradores.length === 1 ? '' : 's'}
             </p>
-            <button type="button" className="btn btn--ghost btn--sm" onClick={rellenarPrecios}>
-              Poner el precio por defecto a los vacíos
-            </button>
+            <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.5rem', alignItems: 'center' }}>
+              <input
+                className="field__control"
+                value={prefijo}
+                onChange={(e) => setPrefijo(e.target.value)}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter') {
+                    e.preventDefault()
+                    nombrarEnSerie()
+                  }
+                }}
+                placeholder="Vestido, Blusa…"
+                aria-label="Prefijo para nombrar en serie"
+                style={{ minHeight: 36, width: 150, fontSize: 'var(--fs-sm)' }}
+              />
+              <button type="button" className="btn btn--ghost btn--sm" onClick={nombrarEnSerie}>
+                Nombrar en serie
+              </button>
+              <button type="button" className="btn btn--ghost btn--sm" onClick={rellenarPrecios}>
+                Rellenar precios
+              </button>
+            </div>
           </div>
 
           <div className="bulk">

@@ -427,7 +427,7 @@
 }
 
 .bulk__thumb {
-  width: 46px;
+  width: 74px;
   aspect-ratio: 2 / 3;
   object-fit: cover;
   background: var(--bone);
