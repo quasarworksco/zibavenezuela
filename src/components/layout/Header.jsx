@@ -6,7 +6,6 @@ import Icon from '../ui/Icon.jsx'
 import { TIERS } from '../../lib/constants.js'
 import { useCart } from '../../context/CartContext.jsx'
 import { useWishlist } from '../../context/WishlistContext.jsx'
-import { useAuth } from '../../context/AuthContext.jsx'
 import { useUI } from '../../context/UIContext.jsx'
 
 /**
@@ -23,7 +22,6 @@ export default function Header() {
   const location = useLocation()
   const { count } = useCart()
   const wishlist = useWishlist()
-  const { isAdmin } = useAuth()
   const { togglePanel, headerOverlay } = useUI()
 
   useEffect(() => {
@@ -108,12 +106,6 @@ export default function Header() {
           <Icon name="heart" size={19} />
           {wishlist.count > 0 ? <span className="header__count">{wishlist.count}</span> : null}
         </Link>
-
-        {isAdmin ? (
-          <Link to="/admin" className="header__action header__action--hide-sm">
-            Admin
-          </Link>
-        ) : null}
 
         <button
           type="button"

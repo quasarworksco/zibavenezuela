@@ -4,14 +4,12 @@ import { Link, NavLink, useLocation } from 'react-router-dom'
 import Drawer from '../ui/Drawer.jsx'
 import Icon from '../ui/Icon.jsx'
 import { BAND, SECTIONS, STORE, TIERS } from '../../lib/constants.js'
-import { useAuth } from '../../context/AuthContext.jsx'
 import { useUI } from '../../context/UIContext.jsx'
 import { useCategories } from '../../hooks/useCategories.js'
 
 /** Menú lateral: secciones arriba, categorías de la sección activa debajo. */
 export default function NavDrawer() {
   const { panel, closePanel } = useUI()
-  const { isAdmin, logout } = useAuth()
   const location = useLocation()
   const { bySection, loading } = useCategories()
 
@@ -104,27 +102,6 @@ export default function NavDrawer() {
               Cesta
             </Link>
           </li>
-          {isAdmin ? (
-            <>
-              <li>
-                <Link to="/admin" className="nav__link" onClick={closePanel}>
-                  Administración
-                </Link>
-              </li>
-              <li>
-                <button
-                  type="button"
-                  className="nav__link"
-                  onClick={() => {
-                    logout()
-                    closePanel()
-                  }}
-                >
-                  Cerrar sesión
-                </button>
-              </li>
-            </>
-          ) : null}
         </ul>
 
         <p className="nav__group-title">Ayuda</p>
