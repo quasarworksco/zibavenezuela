@@ -5,7 +5,7 @@ import ProductGrid from '../components/product/ProductGrid.jsx'
 import ProductImage from '../components/product/ProductImage.jsx'
 import Icon from '../components/ui/Icon.jsx'
 import { cldUrl, imageSrc } from '../lib/cloudinary.js'
-import { BAND, HERO, SECTIONS, STORE } from '../lib/constants.js'
+import { BAND, HERO, SECTIONS, STORE, TIERS } from '../lib/constants.js'
 import { listProducts } from '../services/products.js'
 import { useCategories } from '../hooks/useCategories.js'
 import { useUI } from '../context/UIContext.jsx'
@@ -71,12 +71,27 @@ export default function Home() {
               {HERO.title[1]}
             </h1>
 
-            <div className="hero__actions">
-              {SECTIONS.map((s) => (
-                <Link key={s.slug} to={`/${s.slug}`} className="btn btn--glass">
-                  {s.name}
+            <div className="hero__cta">
+              <div className="hero__actions">
+                <Link to={TIERS.mayor.to} className="btn btn--light">
+                  {TIERS.mayor.title}
                 </Link>
-              ))}
+                <Link to={TIERS.detal.to} className="btn btn--glass">
+                  {TIERS.detal.title}
+                </Link>
+              </div>
+
+              <p className="hero__note">
+                <Icon name="truck" size={14} /> Envíos a todo el país
+              </p>
+
+              <div className="hero__sections">
+                {SECTIONS.map((s) => (
+                  <Link key={s.slug} to={`/${s.slug}`}>
+                    {s.name}
+                  </Link>
+                ))}
+              </div>
             </div>
           </div>
 
@@ -94,15 +109,44 @@ export default function Home() {
           <span className="hero-plain__rule" />
           <p className="hero-plain__text">{HERO.text}</p>
 
-          <div className="hero__actions">
-            {SECTIONS.map((s) => (
-              <Link key={s.slug} to={`/${s.slug}`} className="btn btn--ghost">
-                {s.name}
+          <div className="hero__cta">
+            <div className="hero__actions">
+              <Link to={TIERS.mayor.to} className="btn">
+                {TIERS.mayor.title}
               </Link>
-            ))}
+              <Link to={TIERS.detal.to} className="btn btn--ghost">
+                {TIERS.detal.title}
+              </Link>
+            </div>
+
+            <p className="hero__note">
+              <Icon name="truck" size={14} /> Envíos a todo el país
+            </p>
+
+            <div className="hero__sections">
+              {SECTIONS.map((s) => (
+                <Link key={s.slug} to={`/${s.slug}`}>
+                  {s.name}
+                </Link>
+              ))}
+            </div>
           </div>
         </section>
       )}
+
+      {/* Los dos niveles de precio, lo primero tras la portada. El mayor manda. */}
+      <section className="tiers">
+        {[TIERS.mayor, TIERS.detal].map((tier, i) => (
+          <article key={tier.to} className={`tier ${i === 0 ? 'tier--main' : ''}`}>
+            <p className="tier__eyebrow">{tier.eyebrow}</p>
+            <h2 className="tier__title">{tier.title}</h2>
+            <p className="tier__text">{tier.text}</p>
+            <Link to={tier.to} className={`btn ${i === 0 ? 'btn--light' : 'btn--ghost'}`}>
+              {tier.cta}
+            </Link>
+          </article>
+        ))}
+      </section>
 
       {railCategories.length ? (
         <section className="section">

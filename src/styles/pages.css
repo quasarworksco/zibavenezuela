@@ -66,12 +66,56 @@
   animation: ziba-fade-up var(--dur-slow) 80ms var(--ease) both;
 }
 
+/* Llamadas de la portada: los dos precios mandan, las secciones acompañan */
+.hero__cta {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--sp-3);
+  animation: ziba-fade-up var(--dur-slow) 160ms var(--ease) both;
+}
+
 .hero__actions {
   display: flex;
   flex-wrap: wrap;
   gap: var(--sp-3);
   justify-content: center;
-  animation: ziba-fade-up var(--dur-slow) 160ms var(--ease) both;
+}
+
+.hero__actions .btn {
+  min-width: 168px;
+}
+
+.hero__note {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--sp-2);
+  font-size: var(--fs-2xs);
+  text-transform: uppercase;
+  letter-spacing: var(--tracking-wide);
+  opacity: 0.75;
+}
+
+.hero__sections {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: var(--sp-2) var(--sp-4);
+  margin-top: var(--sp-2);
+  font-size: var(--fs-2xs);
+  text-transform: uppercase;
+  letter-spacing: var(--tracking-wide);
+}
+
+.hero__sections a {
+  padding-bottom: 2px;
+  border-bottom: 1px solid currentColor;
+  opacity: 0.8;
+  transition: opacity var(--dur) var(--ease);
+}
+
+.hero__sections a:hover {
+  opacity: 1;
 }
 
 .hero__scroll {
@@ -122,8 +166,79 @@
   font-size: var(--fs-md);
 }
 
-.hero-plain .hero__actions {
+.hero-plain .hero__cta {
   margin-top: var(--sp-3);
+}
+
+/* --- Los dos niveles de precio ------------------------------------------- */
+
+.tiers {
+  display: grid;
+  gap: var(--sp-2);
+  margin-top: var(--sp-7);
+  padding-inline: var(--gutter);
+}
+
+@media (min-width: 768px) {
+  .tiers {
+    /* El mayor ocupa más sitio: es la venta principal */
+    grid-template-columns: 1.25fr 1fr;
+    gap: var(--sp-3);
+  }
+}
+
+.tier {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--sp-3);
+  padding: var(--sp-6) var(--sp-5);
+  border: 1px solid var(--ink-14);
+  background: var(--paper);
+}
+
+.tier--main {
+  border-color: var(--ink);
+  background: var(--ink);
+  color: var(--paper);
+}
+
+.tier__eyebrow {
+  font-size: var(--fs-2xs);
+  text-transform: uppercase;
+  letter-spacing: var(--tracking-xwide);
+  opacity: 0.6;
+}
+
+.tier__title {
+  font-family: var(--font-serif);
+  font-size: var(--fs-2xl);
+  line-height: 1.05;
+  text-transform: uppercase;
+}
+
+.tier__text {
+  max-width: 44ch;
+  font-size: var(--fs-md);
+  color: var(--ink-60);
+}
+
+.tier--main .tier__text {
+  color: rgba(255, 255, 255, 0.72);
+}
+
+.tier .btn {
+  margin-top: auto;
+}
+
+@media (min-width: 768px) {
+  .tier {
+    padding: var(--sp-7) var(--sp-6);
+  }
+
+  .tier--main .tier__title {
+    font-size: var(--fs-3xl);
+  }
 }
 
 /* --- Franja negra --------------------------------------------------------- */

@@ -4,7 +4,7 @@ import ProductImage from './ProductImage.jsx'
 import Icon, { HeartFilled } from '../ui/Icon.jsx'
 import { formatBs, formatPrice } from '../../lib/format.js'
 import { isSoldOut } from '../../services/products.js'
-import { ratesReady, toBs } from '../../lib/pricing.js'
+import { hasWholesale, ratesReady, toBs, wholesaleFrom } from '../../lib/pricing.js'
 import { useRates } from '../../hooks/useRates.js'
 import { useCart } from '../../context/CartContext.jsx'
 import { useWishlist } from '../../context/WishlistContext.jsx'
@@ -96,6 +96,12 @@ export default function ProductCard({ product, priority = false }) {
 
         {ratesReady(rates) ? (
           <p className="card__bs">{formatBs(toBs(product.price, rates.store))}</p>
+        ) : null}
+
+        {hasWholesale(product) ? (
+          <p className="card__mayor">
+            Al mayor {formatPrice(product.wholesalePrice)} · desde {wholesaleFrom(product)} u.
+          </p>
         ) : null}
 
         {availableSizes.length > 1 ? (

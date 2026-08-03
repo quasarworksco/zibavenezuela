@@ -91,6 +91,7 @@ function sortProducts(items, sort) {
  * @param {number} [opts.minPrice]
  * @param {number} [opts.maxPrice]
  * @param {boolean} [opts.inStock]
+ * @param {boolean} [opts.wholesale]  sólo prendas con precio al mayor
  */
 export async function listProducts(opts = {}) {
   const {
@@ -103,6 +104,7 @@ export async function listProducts(opts = {}) {
     minPrice,
     maxPrice,
     inStock,
+    wholesale,
   } = opts
 
   const clauses = [where('active', '==', true)]
@@ -118,6 +120,9 @@ export async function listProducts(opts = {}) {
       p.sizes.some((s) => sizes.includes(s.size) && Number(s.stock ?? 0) > 0),
     )
   }
+  // El precio al mayor se filtra en memoria: Firestore no ofrece "campo > 0"
+  // combinado con el resto de cláusulas sin exigir un índice por combinación.
+  if (wholesale) items = items.filter((p) => Number(p.wholesalePrice ?? 0) > 0)
   if (Number.isFinite(minPrice)) items = items.filter((p) => p.price >= minPrice)
   if (Number.isFinite(maxPrice)) items = items.filter((p) => p.price <= maxPrice)
   if (inStock) items = items.filter((p) => !isSoldOut(p))

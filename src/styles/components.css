@@ -535,6 +535,17 @@ textarea.field__control {
   color: var(--ink-60);
 }
 
+/* Precio al mayor: se marca con un filete para que salte a la vista */
+.card__mayor {
+  align-self: flex-start;
+  margin-top: var(--sp-1);
+  padding: 3px var(--sp-2);
+  border: 1px solid var(--ink);
+  font-size: var(--fs-2xs);
+  text-transform: uppercase;
+  letter-spacing: var(--tracking);
+}
+
 .card__sizes {
   font-size: var(--fs-2xs);
   color: var(--ink-45);

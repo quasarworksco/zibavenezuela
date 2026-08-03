@@ -4,15 +4,16 @@ import { Link, useParams, useSearchParams } from 'react-router-dom'
 import ProductGrid from '../components/product/ProductGrid.jsx'
 import Drawer from '../components/ui/Drawer.jsx'
 import Icon from '../components/ui/Icon.jsx'
-import { SECTIONS, SECTION_NAMES, SORT_OPTIONS } from '../lib/constants.js'
+import { SECTIONS, SECTION_NAMES, SORT_OPTIONS, STORE, TIERS } from '../lib/constants.js'
 import { listProducts } from '../services/products.js'
 import { useCategories } from '../hooks/useCategories.js'
 import { useUI } from '../context/UIContext.jsx'
 import NotFound from './NotFound.jsx'
 
 /**
- * Listado de catálogo. Cubre tres casos con la misma vista:
+ * Listado de catálogo. Cubre cuatro casos con la misma vista:
  *  - /novedades           (mode="novedades")
+ *  - /mayor               (mode="mayor") sólo prendas con precio al mayor
  *  - /:section            todas las prendas de una sección
  *  - /:section/:category  una categoría concreta
  */
@@ -32,7 +33,9 @@ export default function Category({ mode }) {
   const inStock = params.get('stock') === '1'
 
   const isNews = mode === 'novedades'
-  const validSection = isNews || SECTIONS.some((s) => s.slug === section)
+  const isWholesale = mode === 'mayor'
+  const isGlobal = isNews || isWholesale
+  const validSection = isGlobal || SECTIONS.some((s) => s.slug === section)
 
   const currentCategory = useMemo(
     () => categories.find((c) => c.slug === category && c.section === section),
@@ -45,12 +48,13 @@ export default function Category({ mode }) {
     setLoading(true)
 
     listProducts({
-      section: isNews ? undefined : section,
+      section: isGlobal ? undefined : section,
       categorySlug: category,
       sort,
       sizes: sizeFilter.length ? sizeFilter : undefined,
       maxPrice,
       inStock,
+      wholesale: isWholesale,
       max: 120,
     })
       .then((items) => {
@@ -72,13 +76,25 @@ export default function Category({ mode }) {
     }
     // `sizeFilter` es un array nuevo en cada render: se compara serializado
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [validSection, isNews, section, category, sort, sizeFilter.join(','), maxPrice, inStock])
+  }, [
+    validSection,
+    isGlobal,
+    isWholesale,
+    section,
+    category,
+    sort,
+    sizeFilter.join(','),
+    maxPrice,
+    inStock,
+  ])
 
   if (!validSection) return <NotFound />
 
   const title = isNews
     ? 'Novedades'
-    : currentCategory?.name ?? SECTION_NAMES[section] ?? 'Catálogo'
+    : isWholesale
+      ? 'Al mayor'
+      : currentCategory?.name ?? SECTION_NAMES[section] ?? 'Catálogo'
 
   // Tallas presentes en el resultado, para ofrecer sólo filtros con sentido
   const availableSizes = [
@@ -114,8 +130,8 @@ export default function Category({ mode }) {
         <nav className="crumbs" aria-label="Ruta de navegación">
           <Link to="/">Inicio</Link>
           <span>/</span>
-          {isNews ? (
-            <span>Novedades</span>
+          {isGlobal ? (
+            <span>{title}</span>
           ) : (
             <>
               <Link to={`/${section}`}>{SECTION_NAMES[section]}</Link>
@@ -130,6 +146,25 @@ export default function Category({ mode }) {
         </nav>
 
         <h1 className="listing__title">{title}</h1>
+        {isWholesale ? (
+          <>
+            <p className="u-muted" style={{ maxWidth: '62ch' }}>
+              {TIERS.mayor.text} El precio al mayor se aplica solo en la cesta, al llegar a la
+              cantidad mínima de cada prenda. Enviamos a todo el país.
+            </p>
+            <a
+              className="btn btn--sm"
+              style={{ marginTop: 'var(--sp-3)', alignSelf: 'flex-start' }}
+              href={`https://wa.me/${STORE.whatsapp}?text=${encodeURIComponent(
+                'Hola ZIBA, quiero información sobre los precios al mayor.',
+              )}`}
+              target="_blank"
+              rel="noreferrer noopener"
+            >
+              <Icon name="whatsapp" size={15} /> Hablar con ventas
+            </a>
+          </>
+        ) : null}
         {currentCategory?.description ? (
           <p className="u-muted" style={{ maxWidth: '62ch' }}>
             {currentCategory.description}
@@ -200,7 +235,9 @@ export default function Category({ mode }) {
           emptyText={
             activeFilters
               ? 'Ningún artículo coincide con los filtros seleccionados.'
-              : 'Todavía no hay prendas en esta categoría.'
+              : isWholesale
+                ? 'Todavía no hay prendas con precio al mayor publicado. Escríbenos y te pasamos la lista.'
+                : 'Todavía no hay prendas en esta categoría.'
           }
         />
       )}

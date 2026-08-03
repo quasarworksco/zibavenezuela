@@ -135,12 +135,33 @@ export const HERO = {
   text: 'Ropa de tendencia para mujer, hombre y niños. Al detal y al mayor, con envíos a todo el país.',
 }
 
-/** Franja negra de la portada. */
+/** Franja negra de la portada: cierra la venta al mayor por WhatsApp. */
 export const BAND = {
   eyebrow: 'Mayoristas',
-  title: 'Al mayor y al detal',
-  text: 'Llévate una pieza para ti o surte tu negocio. Mientras más cantidad, mejor el precio.',
+  title: 'Pide tu lista de precios',
+  text: 'Escríbenos y te pasamos disponibilidad, cantidades mínimas y el precio por volumen. Enviamos a todo el país.',
   cta: 'Precios al mayor',
+}
+
+/**
+ * Los dos niveles de precio, tal como se anuncian en la portada.
+ * El mayor va primero y con más peso visual: es la venta principal.
+ */
+export const TIERS = {
+  mayor: {
+    eyebrow: 'Nuestro fuerte',
+    title: 'Al mayor',
+    text: 'Surte tu negocio con precio por unidad rebajado. Mientras más piezas llevas, menos pagas por cada una.',
+    cta: 'Ver precios al mayor',
+    to: '/mayor',
+  },
+  detal: {
+    eyebrow: 'También',
+    title: 'Al detal',
+    text: 'Compra una sola pieza si es para ti. Mismo catálogo, sin cantidad mínima.',
+    cta: 'Comprar al detal',
+    to: '/novedades',
+  },
 }
 
 /** Frase de la barra superior. */

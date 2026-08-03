@@ -41,6 +41,7 @@ export default function App() {
 
             {/* Catálogo */}
             <Route path="novedades" element={<Category mode="novedades" />} />
+            <Route path="mayor" element={<Category mode="mayor" />} />
             <Route path="buscar" element={<Search />} />
             <Route path="producto/:slug" element={<Product />} />
             <Route path=":section" element={<Category />} />
