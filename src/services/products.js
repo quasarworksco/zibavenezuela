@@ -162,27 +162,118 @@ export async function listRelated(product, max = 4) {
   return items.filter((p) => p.id !== product.id).slice(0, max)
 }
 
-/** Búsqueda por prefijo usando el array `searchTokens`. */
-export async function searchProducts(term, max = 40) {
-  const token = String(term ?? '')
-    .normalize('NFD')
-    .replace(/[\u0300-\u036f]/g, '')
-    .toLowerCase()
-    .trim()
-    .split(/\s+/)[0]
-
-  if (!token || token.length < 2) return []
-
-  const snap = await getDocs(
-    query(
-      productsRef,
-      where('active', '==', true),
-      where('searchTokens', 'array-contains', token.slice(0, 12)),
-      fbLimit(max),
+/**
+ * Corta una consulta que tarda demasiado.
+ *
+ * Con la red caída el SDK de Firestore reintenta durante mucho rato sin
+ * rechazar, y la página se quedaba en «Buscando…» para siempre. Es preferible
+ * fallar y decirlo.
+ */
+function conLimite(promise, ms = 12000) {
+  return Promise.race([
+    promise,
+    new Promise((_, reject) =>
+      setTimeout(() => reject(new Error('La consulta tardó demasiado.')), ms),
     ),
-  )
-  return snap.docs.map(mapProduct)
+  ])
 }
+
+/** Texto normalizado para comparar: sin tildes y en minúsculas. */
+function normalizar(value) {
+  return String(value ?? '')
+    .normalize('NFD')
+    .replace(/[̀-ͯ]/g, '')
+    .toLowerCase()
+}
+
+/** Todo el texto de un producto en el que tiene sentido buscar. */
+function textoBuscable(p) {
+  return normalizar(
+    [p.name, p.categoryName, p.section, p.sku, p.description, (p.tags ?? []).join(' ')].join(' '),
+  )
+}
+
+// El catálogo activo se guarda unos minutos: la búsqueda de reserva lo recorre
+// en memoria y así no se repiten las lecturas en cada consulta.
+const CATALOGO_MS = 5 * 60 * 1000
+let catalogoCache = null
+let catalogoEn = 0
+
+/** Olvida el catálogo guardado. Se llama al tocar cualquier producto. */
+export function invalidateCatalog() {
+  catalogoCache = null
+  catalogoEn = 0
+}
+
+async function catalogoActivo() {
+  if (catalogoCache && Date.now() - catalogoEn < CATALOGO_MS) return catalogoCache
+
+  const snap = await conLimite(
+    getDocs(query(productsRef, where('active', '==', true), fbLimit(500))),
+  )
+
+  // Sin conexión, Firestore no rechaza la consulta: responde con lo que tenga
+  // en su caché local, que la primera vez está vacía. Eso llegaba a la página
+  // como «sin resultados», que es engañoso: no es que no haya nada, es que no
+  // se pudo preguntar.
+  if (snap.empty && snap.metadata.fromCache) {
+    throw new Error('No se pudo consultar el catálogo: no hay conexión con la base de datos.')
+  }
+
+  catalogoCache = snap.docs.map(mapProduct)
+  catalogoEn = Date.now()
+  return catalogoCache
+}
+
+/**
+ * Busca prendas por nombre, categoría, sección, referencia, etiquetas o
+ * descripción.
+ *
+ * Primero se intenta la consulta por prefijos, que resuelve Firestore. Puede no
+ * estar disponible: combinar `active` con `array-contains` exige un índice
+ * compuesto que hay que desplegar aparte, y hasta que exista Firestore rechaza
+ * la consulta. Por eso, si falla —o si no encuentra nada, porque algún producto
+ * se guardara sin `searchTokens`— se recorre el catálogo en memoria.
+ *
+ * La reserva busca además por trozo de palabra y exige todas las palabras, así
+ * que «baggy» encuentra «Jean baggy azul», y «jean baggy» también.
+ */
+export async function searchProducts(term, max = 40) {
+  const limpio = normalizar(term).trim()
+  const palabras = limpio.split(/\s+/).filter((w) => w.length > 1)
+  if (!palabras.length) return []
+
+  // 1) Consulta indexada: sólo sirve con una palabra y buscando por prefijo
+  if (palabras.length === 1) {
+    try {
+      const snap = await conLimite(
+        getDocs(
+          query(
+            productsRef,
+            where('active', '==', true),
+            where('searchTokens', 'array-contains', palabras[0].slice(0, 12)),
+            fbLimit(max),
+          ),
+        ),
+      )
+      if (snap.docs.length) return snap.docs.map(mapProduct)
+    } catch (err) {
+      console.warn('Búsqueda indexada no disponible, se busca en memoria:', err?.code ?? err)
+    }
+  }
+
+  // 2) Reserva en memoria; primero los que llevan el término en el nombre
+  const catalogo = await catalogoActivo()
+  return catalogo
+    .filter((p) => palabras.every((w) => textoBuscable(p).includes(w)))
+    .sort(
+      (a, b) =>
+        (normalizar(a.name).includes(limpio) ? 0 : 1) -
+        (normalizar(b.name).includes(limpio) ? 0 : 1),
+    )
+    .slice(0, max)
+}
+
 
 /** Recupera varios productos por id (para la lista de deseos). */
 export async function getProductsByIds(ids = []) {
@@ -245,6 +336,7 @@ export async function createProduct(input) {
     createdAt: serverTimestamp(),
     updatedAt: serverTimestamp(),
   })
+  invalidateCatalog()
   return ref.id
 }
 
@@ -253,13 +345,16 @@ export async function updateProduct(id, input) {
     ...toDocument(input),
     updatedAt: serverTimestamp(),
   })
+  invalidateCatalog()
 }
 
 /** Cambia sólo la visibilidad, sin tocar el resto del documento. */
 export async function setProductActive(id, active) {
   await updateDoc(doc(db, COL.products, id), { active, updatedAt: serverTimestamp() })
+  invalidateCatalog()
 }
 
 export async function deleteProduct(id) {
   await deleteDoc(doc(db, COL.products, id))
+  invalidateCatalog()
 }

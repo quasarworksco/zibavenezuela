@@ -11,6 +11,7 @@ export default function Search() {
 
   const [products, setProducts] = useState([])
   const [loading, setLoading] = useState(Boolean(term))
+  const [error, setError] = useState('')
 
   useEffect(() => {
     if (!term) {
@@ -21,10 +22,18 @@ export default function Search() {
 
     let active = true
     setLoading(true)
+    setError('')
 
     searchProducts(term)
       .then((items) => active && setProducts(items))
-      .catch((err) => console.error('La búsqueda falló:', err))
+      .catch((err) => {
+        // Antes se tragaba el fallo y la página decía «sin resultados», que es
+        // justo lo que no hay que enseñar cuando la consulta no llegó a correr.
+        console.error('La búsqueda falló:', err)
+        if (!active) return
+        setProducts([])
+        setError('No pudimos completar la búsqueda. Revisa tu conexión e inténtalo de nuevo.')
+      })
       .finally(() => active && setLoading(false))
 
     return () => {
@@ -41,18 +50,25 @@ export default function Search() {
         <p className="listing__count">
           {loading
             ? 'Buscando…'
-            : term
-              ? `${products.length} artículo${products.length === 1 ? '' : 's'}`
-              : 'Escribe qué prenda buscas en el buscador de la cabecera.'}
+            : error
+              ? 'No se pudo buscar'
+              : term
+                ? `${products.length} artículo${products.length === 1 ? '' : 's'}`
+                : 'Escribe qué prenda buscas en el buscador de la cabecera.'}
         </p>
       </div>
 
-      {term ? (
+      {error ? (
+        <div className="empty">
+          <p className="empty__title">Algo salió mal</p>
+          <p>{error}</p>
+        </div>
+      ) : term ? (
         <ProductGrid
           products={products}
           loading={loading}
           emptyTitle="Sin resultados"
-          emptyText="Prueba con otra palabra: camisa, vestido, abrigo…"
+          emptyText="Prueba con otra palabra, o con parte del nombre: baggy, jean, vestido…"
         />
       ) : null}
     </>
