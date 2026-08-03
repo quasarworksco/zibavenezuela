@@ -107,14 +107,11 @@ export default function Bulk() {
 
   // --- Creación -------------------------------------------------------------
 
-  const incompletos = borradores.filter((d) => !d.name.trim() || !(Number(d.price) > 0))
+  // Sin precio no se puede vender, así que ese producto nace oculto
+  const sinPrecio = borradores.filter((d) => !(Number(d.price) > 0))
 
   const crearTodos = async () => {
     if (!borradores.length) return
-    if (incompletos.length) {
-      toast(`Faltan nombre o precio en ${incompletos.length}`)
-      return
-    }
 
     const categoria = categories.find((c) => c.slug === defectos.categorySlug)
     const tallas = (SIZE_PRESETS[defectos.sizePreset] ?? []).map((size) => ({
@@ -126,9 +123,10 @@ export default function Bulk() {
     setCreando({ hechas: 0, total: borradores.length })
 
     const resultados = await mapLimit(borradores, CREACIONES_A_LA_VEZ, async (d) => {
+      const precio = Number(d.price) || 0
       const id = await createProduct({
-        name: d.name.trim(),
-        price: Number(d.price),
+        name: d.name.trim() || 'Sin nombre',
+        price: precio,
         section: defectos.section,
         categorySlug: defectos.categorySlug,
         categoryName: categoria?.name ?? '',
@@ -136,7 +134,8 @@ export default function Bulk() {
         wholesaleMinQty: defectos.wholesalePrice ? Number(defectos.wholesaleMinQty) : null,
         images: [{ ...d.image, alt: d.name.trim() }],
         sizes: tallas,
-        active: defectos.active,
+        // Un producto sin precio nunca se publica, aunque la casilla lo pida
+        active: defectos.active && precio > 0,
         isNew: defectos.isNew,
       })
       setCreando((c) => ({ ...c, hechas: c.hechas + 1 }))
@@ -150,9 +149,13 @@ export default function Bulk() {
     // Sólo se quitan de la lista los que sí se crearon: los fallidos quedan
     // para poder reintentarlos sin volver a subir la foto
     setBorradores(fallidos.map((r) => r.item))
-    setResumen({ creados: ok.length, fallidos: fallidos.length })
+    setResumen({
+      creados: ok.length,
+      fallidos: fallidos.length,
+      ocultos: borradores.filter((d) => !(Number(d.price) > 0)).length - fallidos.length,
+    })
 
-    toast(fallidos.length ? `${ok.length} creados, ${fallidos.length} fallaron` : `${ok.length} productos creados`)
+    toast(fallidos.length ? `${ok.length} guardados, ${fallidos.length} fallaron` : `${ok.length} productos guardados`)
   }
 
   const ocupado = Boolean(subiendo || creando)
@@ -215,15 +218,19 @@ export default function Bulk() {
           </>
         ) : (
           <p className="field__hint">
-            Cada foto será un producto. El nombre se toma del archivo, así que puedes renombrarlos
-            antes de subirlos para ahorrarte escribir.
+            Cada foto será un producto. El nombre se toma del archivo. Puedes subirlas todas ahora
+            y ponerles nombre, precio y categoría más tarde.
           </p>
         )}
       </section>
 
       {/* Paso 2 — datos comunes */}
       <section className="panel">
-        <p className="panel__title">2 · Datos para todos</p>
+        <p className="panel__title">2 · Datos para todos (opcional)</p>
+
+        <p className="field__hint" style={{ marginTop: 0, marginBottom: 'var(--sp-4)' }}>
+          Puedes dejarlo como está y completarlo más tarde desde cada producto.
+        </p>
 
         <div className="field-row">
           <label className="field">
@@ -359,7 +366,8 @@ export default function Bulk() {
             }}
           >
             <p className="panel__title" style={{ margin: 0, border: 0, padding: 0 }}>
-              3 · {borradores.length} producto{borradores.length === 1 ? '' : 's'}
+              3 · {borradores.length} foto{borradores.length === 1 ? '' : 's'} lista
+              {borradores.length === 1 ? '' : 's'}
             </p>
             <button type="button" className="btn btn--ghost btn--sm" onClick={rellenarPrecios}>
               Poner el precio por defecto a los vacíos
@@ -412,10 +420,10 @@ export default function Bulk() {
           </div>
 
           <div style={{ marginTop: 'var(--sp-5)' }}>
-            {incompletos.length ? (
-              <p className="field__error">
-                Faltan nombre o precio en {incompletos.length} producto
-                {incompletos.length === 1 ? '' : 's'}.
+            {sinPrecio.length ? (
+              <p className="field__hint">
+                {sinPrecio.length} sin precio: se guardan ocultos y no aparecen en la tienda hasta
+                que les pongas uno.
               </p>
             ) : null}
 
@@ -433,10 +441,10 @@ export default function Bulk() {
                 type="button"
                 className="btn"
                 onClick={crearTodos}
-                disabled={ocupado || Boolean(incompletos.length)}
+                disabled={ocupado}
               >
-                Crear {borradores.length} producto{borradores.length === 1 ? '' : 's'}
-                {defectos.price ? ` · desde ${formatPrice(Number(defectos.price) || 0)}` : ''}
+                Guardar {borradores.length} producto{borradores.length === 1 ? '' : 's'}
+                {defectos.price ? ` · ${formatPrice(Number(defectos.price) || 0)}` : ''}
               </button>
             )}
           </div>
@@ -447,8 +455,11 @@ export default function Bulk() {
         <section className="panel">
           <p className="panel__title">Resultado</p>
           <p>
-            {resumen.creados} producto{resumen.creados === 1 ? '' : 's'} creado
+            {resumen.creados} producto{resumen.creados === 1 ? '' : 's'} guardado
             {resumen.creados === 1 ? '' : 's'}.
+            {resumen.ocultos > 0
+              ? ` ${resumen.ocultos} quedaron ocultos por no tener precio: complétalos desde el catálogo filtrando por «Sin completar».`
+              : ''}
             {resumen.fallidos
               ? ` ${resumen.fallidos} fallaron y siguen en la lista para reintentar.`
               : ''}

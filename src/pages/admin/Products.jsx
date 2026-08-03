@@ -22,6 +22,7 @@ export default function Products() {
   const [error, setError] = useState('')
   const [term, setTerm] = useState('')
   const [section, setSection] = useState('')
+  const [estado, setEstado] = useState('')
   const [pendingDelete, setPendingDelete] = useState(null)
   const [busy, setBusy] = useState(false)
   const { toast } = useUI()
@@ -42,10 +43,16 @@ export default function Products() {
 
   useEffect(load, [])
 
+  // Le falta algo para poder venderse: precio o categoría
+  const incompleto = (p) => !(p.price > 0) || !p.categorySlug
+
   const filtered = useMemo(() => {
     const needle = term.trim().toLowerCase()
     return products.filter((p) => {
       if (section && p.section !== section) return false
+      if (estado === 'incompletos' && !incompleto(p)) return false
+      if (estado === 'publicados' && !p.active) return false
+      if (estado === 'ocultos' && p.active) return false
       if (!needle) return true
       return (
         p.name.toLowerCase().includes(needle) ||
@@ -53,7 +60,7 @@ export default function Products() {
         p.categoryName.toLowerCase().includes(needle)
       )
     })
-  }, [products, term, section])
+  }, [products, term, section, estado])
 
   const toggleActive = async (product) => {
     // Optimista: si falla se revierte al recargar
@@ -104,6 +111,16 @@ export default function Products() {
           placeholder="Buscar por nombre, referencia o categoría"
           style={{ minWidth: 260 }}
         />
+        <select
+          className="field__control"
+          value={estado}
+          onChange={(e) => setEstado(e.target.value)}
+        >
+          <option value="">Todos</option>
+          <option value="incompletos">Sin completar</option>
+          <option value="publicados">Publicados</option>
+          <option value="ocultos">Ocultos</option>
+        </select>
         <select
           className="field__control"
           value={section}
@@ -169,9 +186,15 @@ export default function Products() {
                     <td data-label="Precio">{formatPrice(product.price)}</td>
                     <td data-label="Stock" className={stock <= 0 ? 'u-muted' : ''}>{stock}</td>
                     <td data-label="Estado">
-                      <span className={`badge ${product.active ? 'badge--solid' : ''}`}>
-                        {product.active ? 'Publicado' : 'Oculto'}
-                      </span>
+                      {incompleto(product) ? (
+                        <span className="badge" title="Le falta precio o categoría">
+                          Sin completar
+                        </span>
+                      ) : (
+                        <span className={`badge ${product.active ? 'badge--solid' : ''}`}>
+                          {product.active ? 'Publicado' : 'Oculto'}
+                        </span>
+                      )}
                     </td>
                     <td data-label="">
                       <div className="table__actions">
