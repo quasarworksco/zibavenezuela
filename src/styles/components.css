@@ -296,6 +296,14 @@ textarea.field__control {
   padding: var(--gutter);
 }
 
+/* Dentro del modal la capa oscura va debajo del panel. Llevaba el z-index
+   general de las capas (85), mayor que el del panel, así que lo tapaba: el
+   panel salía difuminado por el blur de la capa y, peor aún, los botones no
+   recibían el clic porque lo interceptaba ella. */
+.modal .overlay {
+  z-index: 0;
+}
+
 .modal__panel {
   position: relative;
   z-index: 1;
