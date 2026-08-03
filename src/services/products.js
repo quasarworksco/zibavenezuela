@@ -79,6 +79,35 @@ function sortProducts(items, sort) {
 }
 
 /**
+ * Corta una consulta que tarda demasiado.
+ *
+ * Con la red caída el SDK de Firestore reintenta durante mucho rato sin
+ * rechazar, y la página se quedaba en «Buscando…» para siempre. Es preferible
+ * fallar y decirlo.
+ */
+function conLimite(promise, ms = 12000) {
+  return Promise.race([
+    promise,
+    new Promise((_, reject) =>
+      setTimeout(() => reject(new Error('La consulta tardó demasiado.')), ms),
+    ),
+  ])
+}
+
+/**
+ * Distingue "no hay nada" de "no se pudo preguntar".
+ *
+ * Sin conexión el SDK no rechaza la consulta: responde con lo que tenga en su
+ * caché local, que la primera vez está vacía. Eso llegaba a la tienda como un
+ * catálogo vacío, y la página decía que no había prendas.
+ */
+function comprobarConexion(snap) {
+  if (snap.empty && snap.metadata.fromCache) {
+    throw new Error('No hay conexión con la base de datos.')
+  }
+}
+
+/**
  * Lista productos del escaparate.
  *
  * @param {object} [opts]
@@ -112,7 +141,8 @@ export async function listProducts(opts = {}) {
   if (categorySlug) clauses.push(where('categorySlug', '==', categorySlug))
   if (featured) clauses.push(where('featured', '==', true))
 
-  const snap = await getDocs(query(productsRef, ...clauses, fbLimit(max * 2)))
+  const snap = await conLimite(getDocs(query(productsRef, ...clauses, fbLimit(max * 2))))
+  comprobarConexion(snap)
   let items = snap.docs.map(mapProduct)
 
   if (sizes?.length) {
@@ -162,22 +192,6 @@ export async function listRelated(product, max = 4) {
   return items.filter((p) => p.id !== product.id).slice(0, max)
 }
 
-/**
- * Corta una consulta que tarda demasiado.
- *
- * Con la red caída el SDK de Firestore reintenta durante mucho rato sin
- * rechazar, y la página se quedaba en «Buscando…» para siempre. Es preferible
- * fallar y decirlo.
- */
-function conLimite(promise, ms = 12000) {
-  return Promise.race([
-    promise,
-    new Promise((_, reject) =>
-      setTimeout(() => reject(new Error('La consulta tardó demasiado.')), ms),
-    ),
-  ])
-}
-
 /** Texto normalizado para comparar: sin tildes y en minúsculas. */
 function normalizar(value) {
   return String(value ?? '')
@@ -212,13 +226,7 @@ async function catalogoActivo() {
     getDocs(query(productsRef, where('active', '==', true), fbLimit(500))),
   )
 
-  // Sin conexión, Firestore no rechaza la consulta: responde con lo que tenga
-  // en su caché local, que la primera vez está vacía. Eso llegaba a la página
-  // como «sin resultados», que es engañoso: no es que no haya nada, es que no
-  // se pudo preguntar.
-  if (snap.empty && snap.metadata.fromCache) {
-    throw new Error('No se pudo consultar el catálogo: no hay conexión con la base de datos.')
-  }
+  comprobarConexion(snap)
 
   catalogoCache = snap.docs.map(mapProduct)
   catalogoEn = Date.now()

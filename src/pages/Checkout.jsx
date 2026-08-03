@@ -111,7 +111,13 @@ export default function Checkout() {
       navigate(`/pedido/${id}`, { replace: true })
     } catch (err) {
       console.error('No se pudo registrar el pedido:', err)
-      setFailure('No pudimos registrar tu pedido. Inténtalo de nuevo en unos segundos.')
+      // Si nos quedamos sin la talla, decirlo: es algo que la persona puede
+      // arreglar por su cuenta cambiando la cesta.
+      setFailure(
+        err?.code === 'sin-stock'
+          ? `${err.message} Ajusta la cesta y vuelve a intentarlo.`
+          : 'No pudimos registrar tu pedido. Inténtalo de nuevo en unos segundos.',
+      )
       setSending(false)
     }
   }
