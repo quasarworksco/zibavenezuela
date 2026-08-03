@@ -9,8 +9,8 @@
 // El nombre del cloud y el preset sin firmar son datos públicos por diseño:
 // viajan en cada URL de imagen y en cada subida. Se dejan como valor por
 // defecto para que la tienda funcione sin configurar nada.
-export const CLOUD_NAME = import.meta.env.VITE_CLOUDINARY_CLOUD_NAME ?? 'zibave'
-export const UPLOAD_PRESET = import.meta.env.VITE_CLOUDINARY_UPLOAD_PRESET ?? 'jtdqewim'
+export const CLOUD_NAME = import.meta.env.VITE_CLOUDINARY_CLOUD_NAME ?? 'jtdqewim'
+export const UPLOAD_PRESET = import.meta.env.VITE_CLOUDINARY_UPLOAD_PRESET ?? 'zibave'
 export const UPLOAD_FOLDER = import.meta.env.VITE_CLOUDINARY_FOLDER ?? 'ziba'
 
 export const isCloudinaryReady = Boolean(CLOUD_NAME)

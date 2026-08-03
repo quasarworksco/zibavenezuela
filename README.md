@@ -67,8 +67,8 @@ entra por `/entrar` y la sesión se recuerda en `localStorage`.
 Ya está configurado y no hace falta tocar nada:
 
 ```
-VITE_CLOUDINARY_CLOUD_NAME=zibave
-VITE_CLOUDINARY_UPLOAD_PRESET=jtdqewim
+VITE_CLOUDINARY_CLOUD_NAME=jtdqewim
+VITE_CLOUDINARY_UPLOAD_PRESET=zibave
 VITE_CLOUDINARY_FOLDER=ziba
 ```
 
