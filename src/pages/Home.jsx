@@ -1,6 +1,7 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { Link } from 'react-router-dom'
 
+import HeroSlides from '../components/home/HeroSlides.jsx'
 import ProductGrid from '../components/product/ProductGrid.jsx'
 import ProductImage from '../components/product/ProductImage.jsx'
 import Icon from '../components/ui/Icon.jsx'
@@ -9,6 +10,9 @@ import { BAND, HERO, SECTIONS, STORE, TIERS } from '../lib/constants.js'
 import { listProducts } from '../services/products.js'
 import { useCategories } from '../hooks/useCategories.js'
 import { useUI } from '../context/UIContext.jsx'
+
+/** Cuántas fotos entran en la rotación, para no cargar el catálogo entero. */
+const MAX_FOTOS = 8
 
 /** Portada: gran imagen editorial, accesos por sección y una selección. */
 export default function Home() {
@@ -37,31 +41,33 @@ export default function Home() {
     }
   }, [])
 
-  // La portada se ilustra con la primera pieza destacada que tenga fotografía
-  const heroProduct = featured.find((p) => p.images?.length) ?? latest.find((p) => p.images?.length)
-  const heroImage = heroProduct ? imageSrc(heroProduct.images[0]) : null
+  // La portada rota entre las fotos de todos los productos cargados
+  const heroImages = useMemo(() => {
+    const vistas = new Set()
+    for (const p of [...featured, ...latest]) {
+      if (vistas.size >= MAX_FOTOS) break
+      const src = p.images?.length ? imageSrc(p.images[0]) : null
+      if (src) vistas.add(src)
+    }
+    return [...vistas]
+  }, [featured, latest])
 
   // Con foto, la cabecera va en blanco sobre la imagen; sin foto, en negro
   // sobre el fondo claro. Se restablece al salir de la portada.
+  const hasHero = heroImages.length > 0
   useEffect(() => {
-    setHeaderOverlay(heroImage ? 'dark' : 'light')
+    setHeaderOverlay(hasHero ? 'dark' : 'light')
     return () => setHeaderOverlay(null)
-  }, [heroImage, setHeaderOverlay])
+  }, [hasHero, setHeaderOverlay])
 
   // Cuatro categorías con foto para el carrusel
   const railCategories = categories.filter((c) => c.image).slice(0, 8)
 
   return (
     <>
-      {heroImage ? (
+      {hasHero ? (
         <section className="hero">
-          <div className="hero__media">
-            <img
-              src={cldUrl(heroImage, { w: 1800, h: 1200, gravity: 'auto' })}
-              alt=""
-              fetchPriority="high"
-            />
-          </div>
+          <HeroSlides images={heroImages} />
 
           <div className="hero__content">
             <p className="hero__eyebrow">{HERO.eyebrow}</p>

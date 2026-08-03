@@ -6,6 +6,7 @@ import { formatBs, formatPrice } from '../../lib/format.js'
 import { isSoldOut } from '../../services/products.js'
 import { hasWholesale, ratesReady, toBs, wholesaleFrom } from '../../lib/pricing.js'
 import { useRates } from '../../hooks/useRates.js'
+import { useHoverCapable } from '../../hooks/useHover.js'
 import { useCart } from '../../context/CartContext.jsx'
 import { useWishlist } from '../../context/WishlistContext.jsx'
 
@@ -19,8 +20,10 @@ export default function ProductCard({ product, priority = false }) {
   const wishlist = useWishlist()
   const { rates } = useRates()
 
+  const canHover = useHoverCapable()
   const soldOut = isSoldOut(product)
-  const hasAlt = product.images?.length > 1
+  // La segunda foto sólo se monta donde se puede llegar a ver
+  const hasAlt = canHover && product.images?.length > 1
   const isFavourite = wishlist.has(product.id)
   const onSale = product.compareAtPrice && product.compareAtPrice > product.price
 

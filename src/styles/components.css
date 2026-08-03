@@ -415,33 +415,36 @@ textarea.field__control {
   transition: opacity var(--dur-slow) var(--ease), transform var(--dur-slow) var(--ease);
 }
 
+/* La segunda foto se monta encima y se funde hacia dentro. Nunca se oculta la
+   principal: si la segunda aún no ha bajado, se sigue viendo algo. */
 .card__img--alt {
   position: absolute;
   inset: 0;
   opacity: 0;
 }
 
-.card__media:hover .card__img--alt {
-  opacity: 1;
+/* El cambio al pasar el cursor sólo tiene sentido con ratón. En una pantalla
+   táctil el navegador deja el :hover pegado al tocar o al hacer zoom, y la
+   tarjeta se quedaba en blanco. */
+@media (hover: hover) and (pointer: fine) {
+  .card__media:hover .card__img--alt {
+    opacity: 1;
+  }
+
+  /* Sin segunda foto: leve zoom */
+  .card__media:hover .card__img--solo {
+    transform: scale(1.03);
+  }
 }
 
-.card__media:hover .card__img--main {
-  opacity: 0;
-}
-
-/* Sin segunda foto: leve zoom */
-.card__media:hover .card__img--solo {
-  transform: scale(1.03);
-}
-
+/* Sin desenfoque de fondo: en una rejilla hay una insignia y un corazón por
+   tarjeta, y decenas de capas con backdrop-filter ahogan al móvil. */
 .card__flag {
   position: absolute;
   top: 10px;
   left: 10px;
   padding: 4px 9px;
-  background: var(--glass-bg-strong);
-  -webkit-backdrop-filter: var(--glass-blur-sm);
-  backdrop-filter: var(--glass-blur-sm);
+  background: var(--paper-90);
   border: 1px solid var(--glass-border);
   border-radius: var(--radius-pill);
   font-size: var(--fs-2xs);
@@ -458,12 +461,17 @@ textarea.field__control {
   display: grid;
   place-items: center;
   border-radius: 50%;
-  background: var(--glass-bg);
-  -webkit-backdrop-filter: var(--glass-blur-sm);
-  backdrop-filter: var(--glass-blur-sm);
+  background: var(--paper-90);
   border: 1px solid var(--glass-border);
   opacity: 0;
   transition: opacity var(--dur) var(--ease), transform var(--dur) var(--ease);
+}
+
+/* En táctil no hay hover que lo descubra: se deja siempre visible */
+@media (hover: none), (pointer: coarse) {
+  .card__fav {
+    opacity: 1;
+  }
 }
 
 .card:hover .card__fav,

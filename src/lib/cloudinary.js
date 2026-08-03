@@ -45,13 +45,21 @@ export function cldUrl(src, opts = {}) {
   if (!src) return PLACEHOLDER
   if (src.startsWith('data:')) return src
 
-  const { w, h, crop = 'fill', gravity = 'auto', quality = 'auto', format = 'auto' } = opts
+  const {
+    w,
+    h,
+    crop = 'fill',
+    gravity = 'auto',
+    quality = 'auto',
+    format = 'auto',
+    dpr = 'auto',
+  } = opts
 
   const parts = [`f_${format}`, `q_${quality}`]
   if (w) parts.push(`w_${Math.round(w)}`)
   if (h) parts.push(`h_${Math.round(h)}`)
   if (w || h) parts.push(`c_${crop}`, `g_${gravity}`)
-  if (w) parts.push('dpr_auto')
+  if (w && dpr) parts.push(`dpr_${dpr}`)
   const tx = parts.join(',')
 
   // URL completa de Cloudinary: inyecta las transformaciones tras /upload/
@@ -64,6 +72,28 @@ export function cldUrl(src, opts = {}) {
 
   if (!CLOUD_NAME) return PLACEHOLDER
   return `https://res.cloudinary.com/${CLOUD_NAME}/image/upload/${tx}/${src}`
+}
+
+/**
+ * `srcset` con una relación de aspecto fija: cada ancho lleva su alto.
+ *
+ * Se usa en la portada, donde la foto ocupa la pantalla completa. Pedir sólo
+ * el ancho deja que Cloudinary conserve la forma original de la foto, y al
+ * recortarla el navegador con `object-fit: cover` acaba ampliando muchísimo
+ * una franja estrecha: eso es lo que se veía borroso en el móvil.
+ *
+ * `dpr_auto` se omite a propósito: Cloudinary sólo lo resuelve si el servidor
+ * envía la cabecera `Accept-CH: DPR`, que GitHub Pages no manda, así que
+ * siempre caía en dpr 1. Aquí la densidad la resuelve el navegador eligiendo
+ * candidato del `srcset`.
+ */
+export function cldSrcSetRatio(src, widths, ratio, opts = {}) {
+  if (!src || src.startsWith('data:')) return undefined
+  if (/^https?:\/\//.test(src) && !src.includes('res.cloudinary.com')) return undefined
+  if (!CLOUD_NAME && !src.includes('res.cloudinary.com')) return undefined
+  return widths
+    .map((w) => `${cldUrl(src, { ...opts, w, h: Math.round(w / ratio), dpr: null })} ${w}w`)
+    .join(', ')
 }
 
 /** Genera un `srcset` responsivo para una imagen de producto. */
