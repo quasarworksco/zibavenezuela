@@ -152,7 +152,7 @@ export const CREDIT = 'Hecho por DGP Global Group · Florida, USA'
 /** Datos de contacto de la tienda. */
 export const STORE = {
   name: 'ZIBA VENEZUELA',
-  whatsapp: import.meta.env.VITE_STORE_WHATSAPP ?? '584120000000',
-  email: import.meta.env.VITE_STORE_EMAIL ?? 'hola@zibavenezuela.com',
+  whatsapp: import.meta.env.VITE_STORE_WHATSAPP ?? '584143776372',
+  email: import.meta.env.VITE_STORE_EMAIL ?? 'zibavenezuelaoficial@gmail.com',
   instagram: import.meta.env.VITE_STORE_INSTAGRAM ?? 'zibavenezuela',
 }

@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom'
 
 import Icon from '../ui/Icon.jsx'
 import { LogoStacked } from '../ui/Logo.jsx'
-import { CREDIT, SECTIONS, STORE } from '../../lib/constants.js'
+import { BAND, CREDIT, SECTIONS, STORE } from '../../lib/constants.js'
 import { subscribe } from '../../services/newsletter.js'
 import { useUI } from '../../context/UIContext.jsx'
 
@@ -88,6 +88,15 @@ export default function Footer() {
                 </Link>
               ))}
               <Link to="/novedades">Novedades</Link>
+              <a
+                href={`https://wa.me/${STORE.whatsapp}?text=${encodeURIComponent(
+                  'Hola ZIBA, quiero información sobre los precios al mayor.',
+                )}`}
+                target="_blank"
+                rel="noreferrer noopener"
+              >
+                {BAND.cta}
+              </a>
             </div>
           </div>
 

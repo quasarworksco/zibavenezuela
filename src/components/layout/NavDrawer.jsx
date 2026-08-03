@@ -3,7 +3,7 @@ import { Link, NavLink, useLocation } from 'react-router-dom'
 
 import Drawer from '../ui/Drawer.jsx'
 import Icon from '../ui/Icon.jsx'
-import { SECTIONS } from '../../lib/constants.js'
+import { BAND, SECTIONS, STORE } from '../../lib/constants.js'
 import { useAuth } from '../../context/AuthContext.jsx'
 import { useUI } from '../../context/UIContext.jsx'
 import { useCategories } from '../../hooks/useCategories.js'
@@ -69,6 +69,19 @@ export default function NavDrawer() {
             <li className="nav__link u-muted">Muy pronto</li>
           ) : null}
         </ul>
+
+        <a
+          className="btn btn--block"
+          style={{ marginTop: 'var(--sp-5)' }}
+          href={`https://wa.me/${STORE.whatsapp}?text=${encodeURIComponent(
+            'Hola ZIBA, quiero información sobre los precios al mayor.',
+          )}`}
+          target="_blank"
+          rel="noreferrer noopener"
+          onClick={closePanel}
+        >
+          <Icon name="whatsapp" size={15} /> {BAND.cta}
+        </a>
 
         <p className="nav__group-title">Tu selección</p>
         <ul className="nav__list">
