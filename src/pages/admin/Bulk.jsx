@@ -2,7 +2,13 @@ import { useRef, useState } from 'react'
 import { Link } from 'react-router-dom'
 
 import Icon from '../../components/ui/Icon.jsx'
-import { cldUrl, isCloudinaryReady, uploadImage } from '../../lib/cloudinary.js'
+import {
+  CLOUD_NAME,
+  UPLOAD_PRESET,
+  cldUrl,
+  isCloudinaryReady,
+  uploadImage,
+} from '../../lib/cloudinary.js'
 import { formatPrice } from '../../lib/format.js'
 import { mapLimit, nameFromFilename } from '../../lib/batch.js'
 import { SECTIONS, SIZE_PRESETS } from '../../lib/constants.js'
@@ -39,6 +45,7 @@ export default function Bulk() {
   const [subiendo, setSubiendo] = useState(null)
   const [creando, setCreando] = useState(null)
   const [resumen, setResumen] = useState(null)
+  const [errores, setErrores] = useState([])
   const inputRef = useRef(null)
   const { categories } = useCategories()
   const { toast } = useUI()
@@ -57,6 +64,7 @@ export default function Bulk() {
     }
 
     setResumen(null)
+    setErrores([])
     setSubiendo({ hechas: 0, total: files.length })
 
     const resultados = await mapLimit(files, SUBIDAS_A_LA_VEZ, async (file) => {
@@ -80,6 +88,9 @@ export default function Bulk() {
     setSubiendo(null)
 
     if (fallidas.length) {
+      // Sin el motivo no hay forma de saber qué corregir
+      fallidas.forEach((r) => console.error('Cloudinary rechazó la subida:', r.error))
+      setErrores([...new Set(fallidas.map((r) => r.error?.message ?? 'Error desconocido'))])
       toast(`${nuevos.length} subidas, ${fallidas.length} fallaron`)
     } else {
       toast(`${nuevos.length} foto${nuevos.length === 1 ? '' : 's'} lista${nuevos.length === 1 ? '' : 's'}`)
@@ -206,6 +217,24 @@ export default function Bulk() {
             e.target.value = ''
           }}
         />
+
+        {errores.length ? (
+          <div className="alert alert--error" style={{ marginTop: 'var(--sp-4)' }}>
+            <strong>Cloudinary rechazó las fotos.</strong>
+            <ul style={{ marginTop: '0.5rem' }}>
+              {errores.map((e) => (
+                <li key={e} style={{ fontFamily: 'monospace', fontSize: 'var(--fs-xs)' }}>
+                  {e}
+                </li>
+              ))}
+            </ul>
+            <p className="field__hint">
+              Lo más habitual es que el upload preset «{UPLOAD_PRESET}» no esté en modo
+              <strong> Unsigned</strong>, o que el cloud «{CLOUD_NAME}» no coincida. Se revisa en
+              Cloudinary → Settings → Upload → Upload presets.
+            </p>
+          </div>
+        ) : null}
 
         {subiendo ? (
           <>
